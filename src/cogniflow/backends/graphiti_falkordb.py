@@ -27,6 +27,7 @@ from graphiti_core.llm_client.openai_generic_client import OpenAIGenericClient
 from graphiti_core.nodes import EntityNode, EpisodeType
 from graphiti_core.search.search_filters import ComparisonOperator, DateFilter, SearchFilters
 
+from ..core.policies import DefaultValidityPolicy, ValidityPolicy, filter_valid
 from ..core.types import (
     Belief,
     Episode,
@@ -36,6 +37,7 @@ from ..core.types import (
     ScoredBelief,
     WriteReceipt,
 )
+from ..observability import log_read
 from ._local_embedder import LocalDeterministicEmbedder
 
 
@@ -97,9 +99,22 @@ class GraphitiFalkorDBBackend:
 
     name = "graphiti-falkordb"
 
-    def __init__(self, config: GraphitiFalkorDBConfig) -> None:
+    # Over-fetch stopgap (G3): the FalkorDriver does not apply the date
+    # SearchFilters, so a valid-at-T fact ranked outside top_k would be silently
+    # dropped. Fetch a wider candidate set, validity-filter in-process, then
+    # truncate to top_k.
+    _OVERFETCH_FACTOR = 10
+    _MIN_OVERFETCH = 50
+
+    def __init__(
+        self,
+        config: GraphitiFalkorDBConfig,
+        validity: ValidityPolicy | None = None,
+    ) -> None:
         self.config = config
         self.group_id = config.group_id
+        # The single shared validity definition (G1/T1). Pluggable later (Phase 3).
+        self._validity: ValidityPolicy = validity or DefaultValidityPolicy()
         self._driver = FalkorDriver(host=config.host, port=config.port, database=config.group_id)
         llm_config = LLMConfig(
             api_key=config.llm_api_key,
@@ -174,7 +189,7 @@ class GraphitiFalkorDBBackend:
             group_id=gid,
             created_at=now,
             valid_at=episode.reference_time,
-            episodes=[],
+            episodes=[episode.id],  # provenance always (G4): authoritative facts carry their source
         )
         result = await self._graphiti.add_triplet(source, edge, target)
         created = [e.uuid for e in result.edges if e.expired_at is None]
@@ -186,30 +201,23 @@ class GraphitiFalkorDBBackend:
         )
 
     async def read(self, query: RetrievalQuery) -> RetrievalResult:
+        overfetch = max(query.top_k * self._OVERFETCH_FACTOR, self._MIN_OVERFETCH)
         edges = await self._graphiti.search(
             query=query.text,
             group_ids=[self.group_id],
-            num_results=query.top_k,
+            num_results=overfetch,
             search_filter=self._as_of_filter(query.as_of),
         )
         beliefs = [_edge_to_belief(e) for e in edges]
-        # Deterministic safety net (seam b): the DB-side SearchFilters is
-        # best-effort, so enforce point-in-time validity in-process. This is the
-        # invariant the heartbeat depends on.
-        kept = [b for b in beliefs if self._is_visible(b, query)]
-        results = tuple(ScoredBelief(belief=b) for b in kept)
+        # Deterministic safety net (seam b): the FalkorDriver does not apply the
+        # date SearchFilters, so enforce point-in-time validity in-process using
+        # the single shared ValidityPolicy, then truncate to top_k. This is the
+        # invariant the heartbeat depends on, and it recovers valid-at-T facts
+        # that were ranked outside a naive top_k window.
+        kept = filter_valid(beliefs, query.as_of, query.include_expired, self._validity)
+        results = tuple(ScoredBelief(belief=b) for b in kept[: query.top_k])
+        log_read(query.text, query.as_of, len(beliefs), len(results))
         return RetrievalResult(query=query, results=results, as_of=query.as_of)
-
-    @staticmethod
-    def _is_visible(belief: Belief, query: RetrievalQuery) -> bool:
-        """Point-in-time visibility. With as_of set, event-time validity rules
-        (and supersedes include_expired). Without as_of, include_expired controls
-        whether system-time-expired beliefs are shown."""
-        if query.as_of is not None:
-            return belief.is_valid_at(query.as_of)
-        if not query.include_expired and belief.expired_at is not None:
-            return False
-        return True
 
     async def falsify(
         self,

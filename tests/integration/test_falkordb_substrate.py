@@ -23,6 +23,8 @@ try:
 except Exception:
     pass
 
+from graphiti_core.edges import EntityEdge  # noqa: E402
+
 from cogniflow.backends.graphiti_falkordb import (  # noqa: E402
     GraphitiFalkorDBBackend,
     GraphitiFalkorDBConfig,
@@ -164,6 +166,68 @@ def test_idempotent_under_retry() -> None:
             ).results
             boston = [s for s in results if "Boston" in s.belief.statement]
             assert len(boston) == 1, f"expected 1 Boston belief after retry, got {len(boston)}"
+        finally:
+            await backend.close()
+
+    asyncio.run(run())
+
+
+@pytest.mark.integration
+@requires_stack
+def test_both_stamps_on_superseded_edge() -> None:
+    """G2: a superseded edge carries BOTH invalid_at (event-time) and expired_at
+    (system-time), asserted directly on the stored edge."""
+
+    async def run() -> None:
+        backend = _fresh_backend("it_stamps")
+        await backend.setup()
+        try:
+            await backend.write(
+                _triple_episode(
+                    "ep1", "Acme Corp", "HEADQUARTERED_IN", "Boston",
+                    "Acme Corp is headquartered in Boston", 2019,
+                )
+            )
+            receipt = await backend.write(
+                _triple_episode(
+                    "ep2", "Acme Corp", "HEADQUARTERED_IN", "Denver",
+                    "Acme Corp is headquartered in Denver", 2022,
+                )
+            )
+            assert receipt.invalidated_belief_ids, "no edge was superseded"
+            old = await EntityEdge.get_by_uuid(backend._driver, receipt.invalidated_belief_ids[0])
+            assert old.invalid_at is not None, "event-time invalid_at not stamped"
+            assert old.expired_at is not None, "system-time expired_at not stamped"
+        finally:
+            await backend.close()
+
+    asyncio.run(run())
+
+
+@pytest.mark.integration
+@requires_stack
+def test_triplet_provenance_present() -> None:
+    """G4: a triplet-injected fact carries its originating episode id as provenance."""
+
+    async def run() -> None:
+        backend = _fresh_backend("it_prov")
+        await backend.setup()
+        try:
+            await backend.write(
+                _triple_episode(
+                    "ep-prov", "Acme Corp", "HEADQUARTERED_IN", "Boston",
+                    "Acme Corp is headquartered in Boston", 2019,
+                )
+            )
+            result = await backend.read(
+                RetrievalQuery(
+                    text="Where is Acme Corp headquartered?", as_of=_dt(2020), top_k=5
+                )
+            )
+            assert result.results, "no belief returned"
+            assert "ep-prov" in result.results[0].belief.provenance, (
+                result.results[0].belief.provenance
+            )
         finally:
             await backend.close()
 

@@ -32,9 +32,16 @@ class RetrievalPolicy(Protocol):
 
 @runtime_checkable
 class ValidityPolicy(Protocol):
-    """Whether a belief counts as valid at a given point in time."""
+    """Whether a belief counts as valid at a given point in time.
 
-    def is_valid(self, belief: Belief, as_of: datetime | None) -> bool: ...
+    There is exactly ONE definition of "valid at T" in cogniflow (this contract,
+    realized by :class:`DefaultValidityPolicy`). Both the substrate read path and
+    the agent-layer postprocessor call it. A second copy is a defect.
+    """
+
+    def is_valid(
+        self, belief: Belief, as_of: datetime | None, include_expired: bool = False
+    ) -> bool: ...
 
 
 @runtime_checkable
@@ -65,14 +72,40 @@ class DefaultRetrievalPolicy:
 
 
 class DefaultValidityPolicy:
-    """Live beliefs are valid; if ``as_of`` is given, also enforce event-time."""
+    """The single, event-time-correct definition of "valid at T".
 
-    def is_valid(self, belief: Belief, as_of: datetime | None) -> bool:
-        if not belief.is_live:
-            return False
-        if as_of is None:
+    Event-time and system-time are never ANDed:
+
+    - ``as_of`` set  -> point-in-time *replay*: return ``is_valid_at(as_of)`` only.
+      ``expired_at`` (system-time liveness) is irrelevant; a fact that was true at
+      T must be visible at T even if it has since been superseded.
+    - ``as_of`` is ``None`` -> "current" query: valid iff the belief is still live
+      (``expired_at is None``), unless ``include_expired`` is set.
+    """
+
+    def is_valid(
+        self, belief: Belief, as_of: datetime | None, include_expired: bool = False
+    ) -> bool:
+        if as_of is not None:
+            return belief.is_valid_at(as_of)
+        if include_expired:
             return True
-        return belief.is_valid_at(as_of)
+        return belief.is_live
+
+
+def filter_valid(
+    beliefs: Sequence[Belief],
+    as_of: datetime | None,
+    include_expired: bool = False,
+    policy: ValidityPolicy | None = None,
+) -> list[Belief]:
+    """Keep only beliefs valid under the single shared :class:`ValidityPolicy`.
+
+    The one place validity filtering happens; both the substrate read and the agent
+    postprocessor call this, so there is never a second copy of the rule.
+    """
+    policy = policy or DefaultValidityPolicy()
+    return [b for b in beliefs if policy.is_valid(b, as_of, include_expired)]
 
 
 class NoFalsificationPolicy:

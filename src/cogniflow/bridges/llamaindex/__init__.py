@@ -1,16 +1,23 @@
-"""LlamaIndex bridge — DEFERRED.
+"""LlamaIndex bridge (Phase 1b): adapters that put the cogniflow substrate behind a
+LlamaIndex retriever, node-postprocessor, and agent.
 
-Phase 0 ships only the framework-neutral bridge contracts in
-``cogniflow.bridges.contracts``. The concrete adapters land once the contracts are
-frozen (Phase 2):
+This package imports ``llama-index-core`` (and, for ``agent``, an OpenAI-compatible
+LLM), so it is imported only when used - never from ``cogniflow.bridges.__init__``,
+which keeps the core import-free. Validity is never re-implemented here; the
+postprocessor calls the same ``cogniflow.core.policies`` definition as the substrate.
 
-  - ``TemporalGraphRetriever``     (subclasses ``llama_index.core ... BaseRetriever``)
-  - ``TemporalValidityPostprocessor`` (subclasses ``BaseNodePostprocessor``)
-  - ``verify_fact`` / ``record_observation`` (``FunctionTool``)
-
-Importing this module is intentionally inert; it pulls in no llama-index dependency.
+Deferred to later phases: ``verify_fact`` / ``record_observation`` tools (seams c/d).
 """
 
 from __future__ import annotations
 
-__all__: list[str] = []
+from .agent import build_temporal_agent, make_llm
+from .postprocessor import TemporalValidityPostprocessor
+from .retriever import TemporalGraphRetriever
+
+__all__ = [
+    "TemporalGraphRetriever",
+    "TemporalValidityPostprocessor",
+    "build_temporal_agent",
+    "make_llm",
+]

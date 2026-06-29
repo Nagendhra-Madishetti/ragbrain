@@ -12,6 +12,7 @@ from .policies import (
     RetrievalPolicy,
     ValidityPolicy,
     WritebackPolicy,
+    filter_valid,
 )
 from .types import (
     Belief,
@@ -38,6 +39,7 @@ __all__ = [
     "DefaultValidityPolicy",
     "NoFalsificationPolicy",
     "NeverWritebackPolicy",
+    "filter_valid",
     # types
     "Belief",
     "Episode",

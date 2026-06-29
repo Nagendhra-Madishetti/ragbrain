@@ -7,14 +7,16 @@ superseded beliefs → persist the verdict → reshape the next retrieval.
 
 This is **ChronoRAG** (temporal) × **PALIMPSEST** (self-falsifying) as a library.
 
-> **Status: Phase 1a (walking skeleton, substrate slice).**
-> Done: stable contracts, sync + async conformance harness, and the real
-> `GraphitiFalkorDBBackend` (AsyncSubstrate). THE heartbeat is proven against live
-> FalkorDB + an LLM: the same question at `as_of=T1` vs `as_of=T2` returns different
-> answers because a fact was superseded between them (see `examples/heartbeat_demo.py`
-> and `tests/integration/`).
-> Deferred: the LlamaIndex retriever/postprocessor/agent bridge (Phase 1b), plus
-> write-back, pluggable policies, replay API, verification, and advanced rerank.
+> **Status: Phase 1b (walking skeleton, through the agent path).**
+> Done: the substrate slice (1a) plus the LlamaIndex bridge. THE heartbeat now runs
+> end to end through a `ReActAgent` -> `TemporalGraphRetriever` (seam a) ->
+> `TemporalValidityPostprocessor` (seam b) -> substrate: the same question at
+> `as_of=2020` vs `as_of=2023` returns Boston vs Denver. One shared validity
+> definition (`core.policies`) governs both the substrate read and the postprocessor.
+> Note: the agent is a `ReActAgent` because the configured LLM (MiniMax-M3) emits no
+> native tool calls; FunctionAgent works if a function-calling model is configured.
+> Deferred: write-back (seam d), pluggable policies, replay API, inline verification
+> (seam c), advanced rerank.
 
 ## Design rule
 
