@@ -21,6 +21,16 @@ This is **ChronoRAG** (temporal) × **PALIMPSEST** (self-falsifying) as a librar
 > without touching core. Non-goals (stay honest): no UI in core, no hosted offering,
 > self-hostable is the moat.
 
+> **Product layer - Slice A (OKF in -> temporally-correct answer out, headless).**
+> Cogniflow ingests Google's [Open Knowledge Format](https://github.com/GoogleCloudPlatform/knowledge-catalog)
+> bundles (`cogniflow.okf`, built to the spec's weak conformance, derived `valid_at`
+> labeled, no core changes) and answers through a straight temporal-RAG loop
+> (`cogniflow.pipelines.temporal_rag_answer`). The controlled head-to-head
+> (`demo/okf_head_to_head.py`, same LLM/corpus/pipeline, only the memory layer differs):
+> on an OKF bundle whose `weekly_active_users` metric is redefined March->June, **plain
+> RAG returns the stale 7-day definition; Cogniflow returns the current 28-day one and
+> replays the 7-day one for `as_of=March`.** The win is temporal correctness, not recall.
+
 ## Design rule
 
 The **core is dependency-free**. `cogniflow.core` imports nothing but the standard

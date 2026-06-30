@@ -35,7 +35,7 @@ from .registry import (
     register_policy,
 )
 
-__version__ = "0.0.0"
+__version__ = "0.1.0"
 
 __all__ = [
     "Substrate",
