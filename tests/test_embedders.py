@@ -8,8 +8,10 @@ from __future__ import annotations
 
 import pytest
 
-from cogniflow.backends._local_embedder import LocalDeterministicEmbedder
-from cogniflow.backends.embedders import (
+pytest.importorskip("graphiti_core")  # the embedder layer wraps Graphiti's EmbedderClient
+
+from cogniflow.backends._local_embedder import LocalDeterministicEmbedder  # noqa: E402
+from cogniflow.backends.embedders import (  # noqa: E402
     EXCLUDED_MODELS,
     EmbedderDimensionMismatch,
     EmbedderError,
@@ -18,7 +20,7 @@ from cogniflow.backends.embedders import (
     check_embedding_dimension,
     create_embedder,
 )
-from cogniflow.backends.graphiti_falkordb import GraphitiFalkorDBConfig
+from cogniflow.backends.graphiti_falkordb import GraphitiFalkorDBConfig  # noqa: E402
 
 
 @pytest.fixture(autouse=True)
