@@ -47,6 +47,20 @@ This is **ChronoRAG** (temporal) × **PALIMPSEST** (self-falsifying) as a librar
 > - reliable for concrete statements, weak for abstract prose; structured input (OKF's
 > `fact` key) remains the deterministic path.
 
+> **Product layer - Slice A.3 (the context-serving API: any model can call it).** Cogniflow
+> is now a standalone **context engine** (`cogniflow.context.serve_context`): query in,
+> temporally-correct *context* out - **facts, not a generated answer** - for any model to
+> put in its own prompt. The `as_of` axis is a first-class parameter (the differentiator,
+> exposed). The honesty labels survive to the output: each served fact carries its
+> `valid_at`/`invalid_at`, provenance, and a `valid_at_source` confidence
+> (`authoritative`/`derived`/`none`, plus the raw label) - persisted on the edge at write
+> and round-tripped to the serving boundary, proven end to end by a live test. Two
+> read-only, self-hostable surfaces (`cogniflow.serving`): an **MCP server** (`[mcp]`
+> extra) as the primary "any agent calls it" path, and **HTTP/REST** (`[serve]` extra)
+> underneath - both run in the caller's environment, so data never leaves. The extraction
+> floor ships in every response's `notes`. See [docs/CONTEXT_API.md](docs/CONTEXT_API.md).
+> (The human/compliance audit dashboard is the separate Slice B.)
+
 ## Design rule
 
 The **core is dependency-free**. `cogniflow.core` imports nothing but the standard

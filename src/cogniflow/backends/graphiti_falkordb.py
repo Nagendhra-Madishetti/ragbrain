@@ -95,6 +95,10 @@ class GraphitiFalkorDBConfig:
 
 
 def _edge_to_belief(edge: EntityEdge) -> Belief:
+    # Custom edge attributes (valid_at_source, superseded_by) are persisted as edge
+    # properties at write time and round-trip through graphiti.search into edge.attributes,
+    # so the A.2 honesty label survives all the way to the serving boundary (A.3 T3).
+    attrs = getattr(edge, "attributes", None) or {}
     return Belief(
         id=edge.uuid,
         statement=edge.fact,
@@ -108,6 +112,9 @@ def _edge_to_belief(edge: EntityEdge) -> Belief:
             "group_id": edge.group_id,
             "source_node_uuid": edge.source_node_uuid,
             "target_node_uuid": edge.target_node_uuid,
+            "valid_at_source": attrs.get("valid_at_source"),
+            "superseded_by": attrs.get("superseded_by"),
+            "superseded_by_episode": attrs.get("superseded_by_episode"),
         },
     )
 
@@ -228,6 +235,7 @@ class GraphitiFalkorDBBackend:
             (invalidated if edge.expired_at is not None else created).append(edge.uuid)
         if invalidated and created:
             await self._persist_superseded_by(invalidated, created[0], episode.id)
+        await self._persist_valid_at_source(created, episode)
         return WriteReceipt(
             episode_id=episode.id,
             created_belief_ids=tuple(created),
@@ -254,6 +262,7 @@ class GraphitiFalkorDBBackend:
         invalidated = [e.uuid for e in result.edges if e.expired_at is not None]
         if invalidated and created:
             await self._persist_superseded_by(invalidated, created[0], episode.id)
+        await self._persist_valid_at_source(created, episode)
         return WriteReceipt(
             episode_id=episode.id,
             created_belief_ids=tuple(created),
@@ -318,7 +327,7 @@ class GraphitiFalkorDBBackend:
         "r.created_at AS created_at, r.valid_at AS valid_at, r.invalid_at AS invalid_at, "
         "r.expired_at AS expired_at, r.episodes AS episodes, r.group_id AS group_id, "
         "r.superseded_by AS superseded_by, r.superseded_by_episode AS superseded_by_episode, "
-        "a.uuid AS src, b.uuid AS tgt"
+        "r.valid_at_source AS valid_at_source, a.uuid AS src, b.uuid AS tgt"
     )
 
     async def _persist_superseded_by(
@@ -332,6 +341,19 @@ class GraphitiFalkorDBBackend:
             ids=list(invalidated_ids),
             by=by_belief_id,
             ep=episode_id,
+        )
+
+    async def _persist_valid_at_source(self, created_ids: list[str], episode: Episode) -> None:
+        """Stamp the honesty label (where valid_at came from) onto the created edges so it
+        round-trips to the serving boundary (A.3 T3). The raw label set by the producer
+        (OKF / document front door) is stored verbatim; the context API normalizes it."""
+        raw = (episode.metadata or {}).get("valid_at_source")
+        if not created_ids or not raw:
+            return
+        await self._driver.execute_query(
+            "MATCH ()-[r:RELATES_TO]->() WHERE r.uuid IN $ids SET r.valid_at_source = $src",
+            ids=list(created_ids),
+            src=raw,
         )
 
     @staticmethod
@@ -373,6 +395,7 @@ class GraphitiFalkorDBBackend:
                 "target_node_uuid": rec.get("tgt"),
                 "superseded_by": rec.get("superseded_by"),
                 "superseded_by_episode": rec.get("superseded_by_episode"),
+                "valid_at_source": rec.get("valid_at_source"),
             },
         )
 
