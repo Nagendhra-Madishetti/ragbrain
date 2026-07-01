@@ -1,0 +1,83 @@
+{
+  "captured_at": "2026-07-01T05:13:50.974124+00:00",
+  "panels": {
+    "standard": {
+      "n": 4,
+      "plain_score": 4,
+      "cogniflow_score": 4,
+      "rows": [
+        {
+          "q": "Where is Zephyr Logistics headquartered?",
+          "expect": "Millbrook",
+          "plain": "Zephyr Logistics is headquartered in Millbrook.",
+          "plain_hit": true,
+          "cogniflow": "Zephyr Logistics is headquartered in Millbrook.\n\nSource: [zephyr] \u2014 \"Zephyr Logistics is headquartered in Millbrook [valid_from: 2010-01-01; confidence: derived]\"",
+          "cogniflow_hit": true
+        },
+        {
+          "q": "Where is Corvus Analytics headquartered?",
+          "expect": "Fenwick",
+          "plain": "Fenwick",
+          "plain_hit": true,
+          "cogniflow": "Corvus Analytics is headquartered in Fenwick.\n\nSource: Corvus Analytics is headquartered in Fenwick [valid_from: 2012-01-01; confidence: derived; source: corvus]",
+          "cogniflow_hit": true
+        },
+        {
+          "q": "Where is Halcyon Grid headquartered?",
+          "expect": "Ashford",
+          "plain": "Ashford",
+          "plain_hit": true,
+          "cogniflow": "Halcyon Grid is headquartered in Ashford.\n\nSource: [halcyon, valid_from: 2013-01-01]",
+          "cogniflow_hit": true
+        },
+        {
+          "q": "Where is Vantor Foods headquartered?",
+          "expect": "Draymoor",
+          "plain": "Draymoor",
+          "plain_hit": true,
+          "cogniflow": "Vantor Foods is headquartered in Draymoor.\n\nSource: [valid_from: 2014-01-01; confidence: derived; source: vantor]",
+          "cogniflow_hit": true
+        }
+      ]
+    },
+    "as_of": {
+      "n": 4,
+      "plain_score": 0,
+      "cogniflow_score": 4,
+      "rows": [
+        {
+          "q": "Where was Meridian Systems headquartered in 2015?",
+          "expect": "Calderport",
+          "plain": "I cannot answer this question based on the provided context. The context contains conflicting information about Meridian Systems' headquarters (listing both Calderport and Newhaven), and neither statement specifies a year of 2015.",
+          "plain_hit": false,
+          "cogniflow": "According to the context facts, Meridian Systems was headquartered in **Calderport** (valid from 2009-01-01, source: meridian_old).",
+          "cogniflow_hit": true
+        },
+        {
+          "q": "Where was Orinoco Labs headquartered in 2013?",
+          "expect": "Westfall",
+          "plain": "Based on the context provided, there is conflicting information about Orinoco Labs' headquarters. The context states that Orinoco Labs is headquartered in both Kingsford and Westfall, but it does not specify which location was its headquarters in 2013. Therefore, I cannot definitively answer where Orinoco Labs was headquartered in 2013 based on the given information.",
+          "plain_hit": false,
+          "cogniflow": "According to the context facts, Orinoco Labs is headquartered in Westfall (valid from 2011-01-01, source: orinoco_old).",
+          "cogniflow_hit": true
+        },
+        {
+          "q": "Where was Meridian Systems headquartered in 2011?",
+          "expect": "Calderport",
+          "plain": "Based on the context provided, there is conflicting information about Meridian Systems' headquarters. One statement indicates it was headquartered in Calderport, while another indicates it was headquartered in Newhaven. The context does not specify which year each statement refers to, so it is not possible to definitively determine where Meridian Systems was headquartered specifically in 2011.",
+          "plain_hit": false,
+          "cogniflow": "According to the context facts, Meridian Systems was headquartered in **Calderport**. This fact is valid from 2009-01-01 and remains the established headquarters location as of 2011-01-01.\n\nSource: meridian_old",
+          "cogniflow_hit": true
+        },
+        {
+          "q": "Where was Orinoco Labs headquartered in 2015?",
+          "expect": "Westfall",
+          "plain": "Based on the context provided, Orinoco Labs was headquartered in both Kingsford and Westfall. However, the context does not specify which location corresponds to 2015, so I cannot determine the headquarters location for that specific year from the information given.",
+          "plain_hit": false,
+          "cogniflow": "According to the context facts, Orinoco Labs was headquartered in **Westfall** (valid from 2011-01-01, source: orinoco_old).",
+          "cogniflow_hit": true
+        }
+      ]
+    }
+  }
+}

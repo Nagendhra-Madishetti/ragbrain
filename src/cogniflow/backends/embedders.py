@@ -25,12 +25,15 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import time
+import urllib.error
 import urllib.request
 
 from graphiti_core.embedder.client import EmbedderClient, EmbedderConfig
 
 from ._local_embedder import LocalDeterministicEmbedder
 
+_RETRY_STATUS = {429, 500, 502, 503, 504}
 _DEFAULT_NVIDIA_BASE = "https://integrate.api.nvidia.com/v1"
 
 # Config name -> NVIDIA model string. The default is bge-m3.
@@ -88,8 +91,16 @@ class NvidiaEmbedder(EmbedderClient):
                 "Content-Type": "application/json",
             },
         )
-        with urllib.request.urlopen(req, timeout=self.timeout) as resp:
-            payload = json.loads(resp.read())
+        for attempt in range(5):
+            try:
+                with urllib.request.urlopen(req, timeout=self.timeout) as resp:
+                    payload = json.loads(resp.read())
+                break
+            except urllib.error.HTTPError as e:
+                if e.code in _RETRY_STATUS and attempt < 4:
+                    time.sleep(2**attempt)  # transient 429/5xx from the hosted API
+                    continue
+                raise
         return [row["embedding"] for row in payload["data"]]
 
     async def create(self, input_data: str | list[str]) -> list[float]:

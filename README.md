@@ -115,6 +115,21 @@ This is **ChronoRAG** (temporal) × **PALIMPSEST** (self-falsifying) as a librar
 > tier. Reproduce it: `python demo/capture_demo.py`. See [docs/DEMO.md](docs/DEMO.md). (The
 > fifteen-second-stranger and in-browser visual checks are human steps before launch.)
 
+> **Launch layer - Slice D (the landing page: positioning, framed for a stranger).** A
+> self-contained static page ([demo/static_demo/landing.html](demo/static_demo/landing.html),
+> generated from real runs by `build_landing.py`) that positions Cogniflow as **the auditable,
+> self-hostable belief ledger for agents** and leads with the as-of axis. It positions **by
+> contrast** - the auditable/self-hostable axis the recall-optimized clouds vacated, not a
+> recall fight - with an **honest capability matrix** whose visible *tie row* on retrieval is
+> what makes the win rows believed. The **two-panel benchmark is real and reproducible**
+> (`python demo/benchmark.py`): standard questions **plain RAG 4/4 = Cogniflow 4/4** (honest
+> tie), as-of questions **plain RAG 0/4, Cogniflow 4/4**. Crucially the benchmark corpus is
+> **fictional on purpose** - on famous real entities a large LLM answers as-of questions from
+> its *training* (measured: it scored 4/4), so the temporal advantage only shows on data the
+> model has never seen (i.e. your private data), which is where it's benchmarked. No "first
+> temporal RAG" claim; the extraction floor and inherited retrieval are stated plainly. The
+> fifteen-second-stranger comprehension check is the one human step that remains.
+
 ## Design rule
 
 The **core is dependency-free**. `cogniflow.core` imports nothing but the standard
