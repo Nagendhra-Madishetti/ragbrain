@@ -35,6 +35,41 @@ export type Health = {
   embedder: string;
 };
 
+// ---- audit / replay (the bitemporal ledger) --------------------------------
+export type ResolvedName = { uuid: string; name: string | null; display: string; resolved: boolean };
+
+export type AuditBelief = {
+  belief_id: string;
+  statement: string;
+  valid_at: string | null;
+  invalid_at: string | null;
+  expired_at: string | null;
+  created_at: string | null;
+  valid_at_source: string;
+  valid_at_source_raw: string | null;
+  superseded_by: string | null;
+  provenance: ResolvedName[];
+};
+
+export type ProvenanceTraceResponse = {
+  belief_id: string;
+  asserted_by: ResolvedName[];
+  superseded_by_belief: string | null;
+  superseded_by_episode: ResolvedName | null;
+  invalid_at: string | null;
+  expired_at: string | null;
+};
+
+export type TimelineResponse = { belief: AuditBelief; trace: ProvenanceTraceResponse };
+
+export type DemoSeed = {
+  session_id: string;
+  boston_belief_id: string;
+  denver_belief_id: string;
+  range: { start: string; end: string; superseded_at: string };
+  current: AuditBelief[];
+};
+
 async function jpost<T>(path: string, body: unknown): Promise<T> {
   const r = await fetch(`${API_URL}${path}`, {
     method: "POST",
@@ -101,6 +136,27 @@ export const api = {
   answer: (session_id: string, query: string, as_of: string | null, top_k = 6) =>
     jpost<AnswerResponse>("/api/answer", { session_id, query, as_of, top_k }),
   reset: (session_id: string) => jpost<{ ok: boolean }>(`/api/reset?session_id=${session_id}`, {}),
+
+  // audit / replay ledger (read-only; the money shot)
+  seedDemo: () => jpost<DemoSeed>("/api/demo/seed", {}),
+  getCurrent: (session_id: string) =>
+    jget<{ beliefs: AuditBelief[] }>(`/api/audit/current?session_id=${session_id}`),
+  getEvent: (session_id: string, as_of: string) =>
+    jget<{ as_of: string; beliefs: AuditBelief[] }>(
+      `/api/audit/event?session_id=${session_id}&as_of=${encodeURIComponent(as_of)}`,
+    ),
+  getReplay: (session_id: string, system_time: string) =>
+    jget<{ system_time: string; beliefs: AuditBelief[] }>(
+      `/api/audit/replay?session_id=${session_id}&system_time=${encodeURIComponent(system_time)}`,
+    ),
+  getProvenance: (session_id: string, belief_id: string) =>
+    jget<ProvenanceTraceResponse>(
+      `/api/audit/provenance/${encodeURIComponent(belief_id)}?session_id=${session_id}`,
+    ),
+  getTimeline: (session_id: string, belief_id: string) =>
+    jget<TimelineResponse>(
+      `/api/audit/timeline/${encodeURIComponent(belief_id)}?session_id=${session_id}`,
+    ),
 };
 
 export function confidenceBadgeClass(src: string): string {

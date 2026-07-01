@@ -350,6 +350,100 @@ async def audit_provenance(belief_id: str, session_id: str) -> dict:
     return serialize_trace(trace, names)
 
 
+@app.get("/api/audit/timeline/{belief_id}")
+async def audit_timeline(belief_id: str, session_id: str) -> dict:
+    backend = await _backend(session_id)
+    belief = await backend.get_belief(belief_id)
+    if belief is None:
+        raise HTTPException(404, "belief not found")
+    trace = await backend.provenance_trace(belief_id)
+    uuids = list(belief.provenance) + list(trace.asserted_by)
+    if trace.superseded_by_episode:
+        uuids.append(trace.superseded_by_episode)
+    names = await backend.resolve_episodes(uuids) if uuids else {}
+    return {"belief": serialize_belief(belief, names), "trace": serialize_trace(trace, names)}
+
+
+# ---- guided demo: the Acme HQ bitemporal scenario --------------------------
+# A seeded, deterministic fixture (no LLM, no network) so the system-time replay - the one
+# thing plain RAG cannot do - is the first thing a visitor sees. The two facts are written
+# with backdated created_at (system time = when the filing was learned), so replaying across a
+# multi-year slider genuinely flips Boston->Denver at the 2022 correction. The REPLAY itself is
+# the real engine (system_time_replay + reconstruct); only the fixture data is seeded.
+_DEMO_SID = "demo_acme"
+_C2019 = "2019-01-01T00:00:00+00:00"  # 2019 filing: learned + valid
+_C2022 = "2022-01-01T00:00:00+00:00"  # 2022 filing: learned + valid; Boston ends here
+_BOSTON_ID = "demo-belief-boston"
+_DENVER_ID = "demo-belief-denver"
+_EP_BOSTON = "demo-ep-boston-2019"
+_EP_DENVER = "demo-ep-denver-2022"
+
+
+async def _demo_payload(backend) -> dict:
+    live = await backend.event_time_query(datetime.now(timezone.utc))
+    names = await _names(backend, live)
+    return {
+        "session_id": _DEMO_SID,
+        "boston_belief_id": _BOSTON_ID,
+        "denver_belief_id": _DENVER_ID,
+        "range": {"start": "2018-06-01", "end": "2024-06-01", "superseded_at": "2022-01-01"},
+        "current": [serialize_belief(b, names) for b in live],
+    }
+
+
+@app.post("/api/demo/seed")
+async def demo_seed(session_id: str = _DEMO_SID, force: bool = False) -> dict:
+    backend = await _backend(session_id)
+    gid = backend.group_id
+    if not force:
+        try:
+            known = await backend.system_time_replay(datetime.now(timezone.utc))
+            if any(b.id == _DENVER_ID for b in known):
+                return await _demo_payload(backend)
+        except Exception:
+            pass
+    drv = backend._driver
+    for node_uuid, node_name in (
+        ("demo-ent-acme", "Acme Corp"),
+        ("demo-ent-boston", "Boston"),
+        ("demo-ent-denver", "Denver"),
+    ):
+        await drv.execute_query(
+            "MERGE (n:Entity {uuid:$u}) SET n.name=$name, n.group_id=$gid",
+            u=node_uuid, name=node_name, gid=gid,
+        )
+    for ep_uuid, ep_name in (
+        (_EP_BOSTON, "Acme Corp - 2019 annual report"),
+        (_EP_DENVER, "Acme Corp - 2022 press release"),
+    ):
+        await drv.execute_query(
+            "MERGE (n:Episodic {uuid:$u}) SET n.name=$name, n.group_id=$gid",
+            u=ep_uuid, name=ep_name, gid=gid,
+        )
+    await drv.execute_query(
+        "MATCH (a:Entity {uuid:$s}), (b:Entity {uuid:$t}) "
+        "MERGE (a)-[r:RELATES_TO {uuid:$id}]->(b) "
+        "SET r.fact=$fact, r.name=$pred, r.group_id=$gid, r.created_at=$c, r.valid_at=$v, "
+        "r.invalid_at=$iv, r.expired_at=$ex, r.episodes=$eps, r.superseded_by=$sb, "
+        "r.superseded_by_episode=$sbe, r.valid_at_source=$src",
+        s="demo-ent-acme", t="demo-ent-boston", id=_BOSTON_ID,
+        fact="Acme Corp is headquartered in Boston", pred="HEADQUARTERED_IN", gid=gid,
+        c=_C2019, v=_C2019, iv=_C2022, ex=_C2022, eps=[_EP_BOSTON],
+        sb=_DENVER_ID, sbe=_EP_DENVER, src="provided",
+    )
+    await drv.execute_query(
+        "MATCH (a:Entity {uuid:$s}), (b:Entity {uuid:$t}) "
+        "MERGE (a)-[r:RELATES_TO {uuid:$id}]->(b) "
+        "SET r.fact=$fact, r.name=$pred, r.group_id=$gid, r.created_at=$c, r.valid_at=$v, "
+        "r.episodes=$eps, r.valid_at_source=$src "
+        "REMOVE r.invalid_at, r.expired_at, r.superseded_by, r.superseded_by_episode",
+        s="demo-ent-acme", t="demo-ent-denver", id=_DENVER_ID,
+        fact="Acme Corp is headquartered in Denver", pred="HEADQUARTERED_IN", gid=gid,
+        c=_C2022, v=_C2022, eps=[_EP_DENVER], src="provided",
+    )
+    return await _demo_payload(backend)
+
+
 @app.post("/api/reset")
 async def reset(session_id: str) -> dict:
     sess = _SESSIONS.get(session_id)

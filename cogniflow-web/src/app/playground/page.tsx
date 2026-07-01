@@ -3,18 +3,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  ArrowDownUp,
-  Check,
   Clock,
   Database,
   FileCheck2,
   FileText,
-  Filter,
   Info,
   Loader2,
-  MessageSquareText,
   RotateCcw,
-  Search,
   SendHorizontal,
   Upload,
 } from "lucide-react";
@@ -31,6 +26,7 @@ import { mockAnswer, mockContext, type MockFact } from "@/lib/mock";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { AcmeReplay } from "@/components/playground/acme-replay";
 
 type Doc = { name: string; created: number; superseded: number };
 const fmt = (d: string | null) => (d ? d.slice(0, 10) : "—");
@@ -40,14 +36,6 @@ const DEMO = [
   { t: "acme_report_2020", d: "Acme Robotics is headquartered in Newhaven.", when: "2020-01-01" },
   { t: "acme_ceo_2014", d: "The CEO of Acme Robotics is Dana Voss.", when: "2014-01-01" },
   { t: "acme_ceo_2021", d: "The CEO of Acme Robotics is Marcus Lund.", when: "2021-01-01" },
-];
-
-const STAGES = [
-  { label: "Retrieve", icon: Search },
-  { label: "Filter as-of", icon: Filter },
-  { label: "Rerank", icon: ArrowDownUp },
-  { label: "Generate", icon: MessageSquareText },
-  { label: "Cite", icon: FileCheck2 },
 ];
 
 export default function Playground() {
@@ -62,12 +50,10 @@ export default function Playground() {
   const [asOf, setAsOf] = useState("2015-01-01");
   const [answer, setAnswer] = useState<AnswerResponse | null>(null);
   const [facts, setFacts] = useState<ServedFact[]>([]);
-  const [stage, setStage] = useState(-1); // -1 idle, 0..4 running, 5 done
 
   const [text, setText] = useState("");
   const [title, setTitle] = useState("");
   const [docDate, setDocDate] = useState("");
-  const tick = useRef<ReturnType<typeof setInterval> | null>(null);
   const mock = useRef<MockFact[]>([]);
 
   useEffect(() => {
@@ -86,23 +72,10 @@ export default function Playground() {
         setSid("browser"); // browser demo mode — handlers use the in-browser engine
       }
     })();
-    return () => {
-      if (tick.current) clearInterval(tick.current);
-    };
   }, []);
 
   const asOfValue = useAsOf ? new Date(asOf).toISOString() : null;
   const down = healthErr || (health && !health.falkordb);
-
-  const startPipeline = () => {
-    setStage(0);
-    if (tick.current) clearInterval(tick.current);
-    tick.current = setInterval(() => setStage((s) => (s < 3 ? s + 1 : s)), 650);
-  };
-  const finishPipeline = () => {
-    if (tick.current) clearInterval(tick.current);
-    setStage(5);
-  };
 
   const loadDemo = useCallback(async () => {
     if (!sid) return;
@@ -178,7 +151,6 @@ export default function Playground() {
       if (!sid || !query.trim()) return;
       setBusy(mode);
       setAnswer(null);
-      startPipeline();
       if (down) {
         setTimeout(() => {
           if (mode === "answer") {
@@ -188,9 +160,8 @@ export default function Playground() {
           } else {
             setFacts(mockContext(mock.current, query, asOfValue).facts);
           }
-          finishPipeline();
           setBusy(null);
-        }, 1400);
+        }, 600);
         return;
       }
       try {
@@ -202,10 +173,7 @@ export default function Playground() {
           const r: ContextResponse = await api.context(sid, query, asOfValue);
           setFacts(r.facts);
         }
-        finishPipeline();
       } catch (e) {
-        if (tick.current) clearInterval(tick.current);
-        setStage(-1);
         toast.error(`${mode} failed: ${(e as Error).message}`);
       } finally {
         setBusy(null);
@@ -221,18 +189,24 @@ export default function Playground() {
     setDocs([]);
     setFacts([]);
     setAnswer(null);
-    setStage(-1);
     toast.success("Session reset");
   }, [sid, down]);
 
   return (
     <div className="mx-auto max-w-6xl px-5 py-12">
       <p className="eyebrow mb-3">Playground</p>
-      <h1 className="text-hero mb-3 !text-[clamp(2rem,4vw,3rem)]">Upload any document. Ask &ldquo;as of when?&rdquo;</h1>
+      <h1 className="text-hero mb-3 !text-[clamp(2rem,4vw,3rem)]">Ask &ldquo;as of when?&rdquo;</h1>
       <p className="text-subhead mb-8 max-w-[62ch]">
-        Drop in your own PDFs (or paste text) with the date each was true, then ask &mdash; and
-        move the <b>as-of</b> date to watch the answer change with time. Real ingestion, real
-        bi-temporal store, live on the right.
+        Watch the system&rsquo;s belief change with time in the seeded scenario below &mdash; then
+        bring your own documents.
+      </p>
+
+      <AcmeReplay />
+
+      <h2 className="text-section mb-2">Bring your own documents</h2>
+      <p className="text-subhead mb-8 max-w-[62ch]">
+        Drop in a PDF (or paste text) with the date each fact was true, then ask &mdash; and move
+        the <b>as-of</b> date to watch the answer change. Real ingestion, real bi-temporal store.
       </p>
 
       {down && (
@@ -249,7 +223,7 @@ export default function Playground() {
         </div>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-[320px_1fr_260px]">
+      <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
         {/* CORPUS */}
         <div className="space-y-4">
           <div className="rounded-xl border border-border bg-card p-5 elev">
@@ -377,45 +351,6 @@ export default function Playground() {
           </div>
         </div>
 
-        {/* LIVE PIPELINE */}
-        <div className="lg:sticky lg:top-20 lg:self-start">
-          <div className="rounded-xl border border-border bg-card p-5 elev">
-            <div className="mb-4 text-sm font-semibold">Live pipeline</div>
-            <ol className="space-y-3">
-              {STAGES.map((s, i) => {
-                const state = stage === -1 ? "idle" : stage === 5 || stage > i ? "done" : stage === i ? "active" : "idle";
-                const Icon = s.icon;
-                return (
-                  <li key={s.label} className="flex items-center gap-3">
-                    <span
-                      className={`relative flex size-8 shrink-0 items-center justify-center rounded-lg border ${
-                        state === "done" ? "border-brand/40 bg-brand/10 text-brand"
-                        : state === "active" ? "border-brand bg-brand/10 text-brand"
-                        : "border-border bg-secondary/40 text-muted-foreground"
-                      }`}
-                    >
-                      {state === "done" ? <Check className="size-4" /> : <Icon className="size-4" />}
-                      {state === "active" && (
-                        <motion.span
-                          className="absolute inset-0 rounded-lg ring-2 ring-brand/50"
-                          animate={{ opacity: [0.2, 0.7, 0.2] }}
-                          transition={{ duration: 1, repeat: Infinity }}
-                        />
-                      )}
-                    </span>
-                    <div className="min-w-0">
-                      <div className={`text-sm ${state === "idle" ? "text-muted-foreground" : "text-foreground"}`}>{s.label}</div>
-                    </div>
-                    {state === "active" && <Loader2 className="ml-auto size-3.5 animate-spin text-brand" />}
-                  </li>
-                );
-              })}
-            </ol>
-            <p className="mt-4 text-xs text-muted-foreground">
-              {stage === -1 ? "Ask a question to watch the pipeline run." : stage === 5 ? "Done — answer grounded and cited." : "Running…"}
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   );
