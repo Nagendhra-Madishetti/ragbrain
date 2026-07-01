@@ -58,8 +58,19 @@ export const api = {
       "/api/plugins",
     ),
   newSession: () => jpost<{ session_id: string }>("/api/session", {}).then((r) => r.session_id),
-  setConfig: (session_id: string, cfg: { embedder?: string; reranker?: string }) =>
-    jpost<{ ok: boolean }>("/api/config", { session_id, ...cfg }),
+  setConfig: (
+    session_id: string,
+    cfg: {
+      embedder?: string;
+      reranker?: string;
+      embedder_model?: string;
+      embedder_base_url?: string;
+      embedder_api_key?: string;
+      reranker_model?: string;
+      reranker_base_url?: string;
+      reranker_api_key?: string;
+    },
+  ) => jpost<{ ok: boolean }>("/api/config", { session_id, ...cfg }),
   ingestText: (session_id: string, text: string, title: string, reference_time?: string) =>
     jpost<{ document: string; facts_created: number; facts_superseded: number }>("/api/ingest-text", {
       session_id,

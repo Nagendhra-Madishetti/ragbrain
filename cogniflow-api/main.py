@@ -82,10 +82,17 @@ async def _backend(session_id: str) -> GraphitiFalkorDBBackend:
         raise HTTPException(422, "session_id required")
     sess = _SESSIONS.setdefault(session_id, {"config": {}, "backend": None})
     if sess["backend"] is None:
+        c = sess["config"]
         cfg = GraphitiFalkorDBConfig.from_env(group_id=f"pg_{session_id}")
-        cfg.embedder = sess["config"].get("embedder", DEFAULT_EMBEDDER)
-        cfg.retrieval_policy = sess["config"].get("retrieval_policy", "default")
-        cfg.retrieval_params = sess["config"].get("retrieval_params", {})
+        cfg.embedder = c.get("embedder", DEFAULT_EMBEDDER)
+        if c.get("embedder_model"):
+            cfg.embedder_model = c["embedder_model"]
+        if c.get("embedder_base_url"):
+            cfg.embedder_base_url = c["embedder_base_url"]
+        if c.get("embedder_api_key"):
+            cfg.embedder_api_key = c["embedder_api_key"]
+        cfg.retrieval_policy = c.get("retrieval_policy", "default")
+        cfg.retrieval_params = c.get("retrieval_params", {})
         backend = GraphitiFalkorDBBackend(cfg)
         await backend.setup()
         sess["backend"] = backend
@@ -116,6 +123,14 @@ class PluginConfig(BaseModel):
     session_id: str
     embedder: str | None = None
     reranker: str | None = None  # "" / None = off (default retrieval policy)
+    # custom provider / local model (OpenAI-compatible base_url + model + key). Covers both
+    # "bring your own API provider" and "point at a local model" (e.g. Ollama/vLLM).
+    embedder_model: str | None = None
+    embedder_base_url: str | None = None
+    embedder_api_key: str | None = None
+    reranker_model: str | None = None
+    reranker_base_url: str | None = None
+    reranker_api_key: str | None = None
 
 
 # ---- routes ----------------------------------------------------------------
@@ -158,15 +173,26 @@ async def new_session() -> dict:
 @app.post("/api/config")
 async def set_config(cfg: PluginConfig) -> dict:
     sess = _SESSIONS.setdefault(cfg.session_id, {"config": {}, "backend": None})
+    c = sess["config"]
     if cfg.embedder:
-        sess["config"]["embedder"] = cfg.embedder
+        c["embedder"] = cfg.embedder
+        c["embedder_model"] = cfg.embedder_model
+        c["embedder_base_url"] = cfg.embedder_base_url
+        c["embedder_api_key"] = cfg.embedder_api_key
     if cfg.reranker is not None:
         if cfg.reranker in ("", "off", "default"):
-            sess["config"]["retrieval_policy"] = "default"
-            sess["config"]["retrieval_params"] = {}
+            c["retrieval_policy"] = "default"
+            c["retrieval_params"] = {}
         else:
-            sess["config"]["retrieval_policy"] = "reranker"
-            sess["config"]["retrieval_params"] = {"reranker": cfg.reranker}
+            params: dict = {"reranker": cfg.reranker}
+            if cfg.reranker_model:
+                params["model"] = cfg.reranker_model
+            if cfg.reranker_base_url:
+                params["base_url"] = cfg.reranker_base_url
+            if cfg.reranker_api_key:
+                params["api_key"] = cfg.reranker_api_key
+            c["retrieval_policy"] = "reranker"
+            c["retrieval_params"] = params
     # force rebuild with new config on next use
     if sess["backend"] is not None:
         await sess["backend"].close()
