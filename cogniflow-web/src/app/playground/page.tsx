@@ -1,14 +1,21 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertTriangle,
+  ArrowDownUp,
+  Check,
   Clock,
   Database,
+  FileCheck2,
   FileText,
+  Filter,
   Loader2,
+  MessageSquareText,
   RotateCcw,
-  Sparkles,
+  Search,
+  SendHorizontal,
   Upload,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -20,7 +27,6 @@ import {
   type Health,
   type ServedFact,
 } from "@/lib/api";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +41,14 @@ const DEMO = [
   { t: "acme_ceo_2021", d: "The CEO of Acme Robotics is Marcus Lund.", when: "2021-01-01" },
 ];
 
+const STAGES = [
+  { label: "Retrieve", icon: Search },
+  { label: "Filter as-of", icon: Filter },
+  { label: "Rerank", icon: ArrowDownUp },
+  { label: "Generate", icon: MessageSquareText },
+  { label: "Cite", icon: FileCheck2 },
+];
+
 export default function Playground() {
   const [sid, setSid] = useState<string | null>(null);
   const [health, setHealth] = useState<Health | null>(null);
@@ -47,11 +61,12 @@ export default function Playground() {
   const [asOf, setAsOf] = useState("2015-01-01");
   const [answer, setAnswer] = useState<AnswerResponse | null>(null);
   const [facts, setFacts] = useState<ServedFact[]>([]);
+  const [stage, setStage] = useState(-1); // -1 idle, 0..4 running, 5 done
 
   const [text, setText] = useState("");
   const [title, setTitle] = useState("");
   const [docDate, setDocDate] = useState("");
-  const fileRef = useRef<HTMLInputElement>(null);
+  const tick = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -61,18 +76,30 @@ export default function Playground() {
         setHealthErr(true);
       }
       try {
-        const stored = localStorage.getItem("cf_session");
-        const s = stored || (await api.newSession());
+        const s = localStorage.getItem("cf_session") || (await api.newSession());
         localStorage.setItem("cf_session", s);
         setSid(s);
       } catch {
         setHealthErr(true);
       }
     })();
+    return () => {
+      if (tick.current) clearInterval(tick.current);
+    };
   }, []);
 
   const asOfValue = useAsOf ? new Date(asOf).toISOString() : null;
   const down = healthErr || (health && !health.falkordb);
+
+  const startPipeline = () => {
+    setStage(0);
+    if (tick.current) clearInterval(tick.current);
+    tick.current = setInterval(() => setStage((s) => (s < 3 ? s + 1 : s)), 650);
+  };
+  const finishPipeline = () => {
+    if (tick.current) clearInterval(tick.current);
+    setStage(5);
+  };
 
   const loadDemo = useCallback(async () => {
     if (!sid) return;
@@ -84,7 +111,7 @@ export default function Playground() {
         added.push({ name: x.t, created: r.facts_created, superseded: r.facts_superseded });
       }
       setDocs((d) => [...added, ...d]);
-      toast.success("Demo corpus loaded — try the as-of date on 2013 vs now.");
+      toast.success("Demo corpus loaded — set the as-of date to 2013 vs now.");
     } catch (e) {
       toast.error(`Ingest failed: ${(e as Error).message}`);
     } finally {
@@ -130,6 +157,7 @@ export default function Playground() {
       if (!sid || !query.trim()) return;
       setBusy(mode);
       setAnswer(null);
+      startPipeline();
       try {
         if (mode === "answer") {
           const r = await api.answer(sid, query, asOfValue);
@@ -139,7 +167,10 @@ export default function Playground() {
           const r: ContextResponse = await api.context(sid, query, asOfValue);
           setFacts(r.facts);
         }
+        finishPipeline();
       } catch (e) {
+        if (tick.current) clearInterval(tick.current);
+        setStage(-1);
         toast.error(`${mode} failed: ${(e as Error).message}`);
       } finally {
         setBusy(null);
@@ -154,17 +185,18 @@ export default function Playground() {
     setDocs([]);
     setFacts([]);
     setAnswer(null);
+    setStage(-1);
     toast.success("Session reset");
   }, [sid]);
 
   return (
     <div className="mx-auto max-w-6xl px-5 py-12">
       <p className="eyebrow mb-3">Playground</p>
-      <h1 className="text-hero mb-3 !text-[clamp(2rem,4vw,3rem)]">Upload real docs. Ask &ldquo;as of when?&rdquo;</h1>
+      <h1 className="text-hero mb-3 !text-[clamp(2rem,4vw,3rem)]">Upload any document. Ask &ldquo;as of when?&rdquo;</h1>
       <p className="text-subhead mb-8 max-w-[62ch]">
-        Drop in your own documents (or paste text) with the date each was true. Then ask a
-        question and move the <b>as-of</b> date &mdash; watch the answer change with time, cited
-        and confidence-labeled. Real ingestion, real temporal store.
+        Drop in your own PDFs (or paste text) with the date each was true, then ask &mdash; and
+        move the <b>as-of</b> date to watch the answer change with time. Real ingestion, real
+        temporal store, live on the right.
       </p>
 
       {down && (
@@ -173,65 +205,49 @@ export default function Playground() {
           <div>
             <div className="font-semibold text-foreground">Backend not reachable</div>
             <p className="mt-1 text-muted-foreground">
-              Start FalkorDB and the API, then reload:{" "}
-              <code className="rounded bg-secondary px-1.5 py-0.5">python cogniflow-api/main.py</code>{" "}
-              (needs a running FalkorDB on :6379 and your <code>.env</code>).
+              Start the platform API, then reload:{" "}
+              <code className="rounded bg-secondary px-1.5 py-0.5">python cogniflow-api/main.py</code>.
             </p>
           </div>
         </div>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,380px)_1fr]">
+      <div className="grid gap-6 lg:grid-cols-[320px_1fr_260px]">
         {/* CORPUS */}
         <div className="space-y-4">
           <div className="rounded-xl border border-border bg-card p-5 elev">
             <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
               <Database className="size-4 text-brand" /> Corpus
             </div>
-
-            <label className="mb-3 block cursor-pointer rounded-lg border border-dashed border-border bg-secondary/40 p-5 text-center transition-colors hover:border-brand/50 hover:bg-secondary">
-              <Upload className="mx-auto mb-2 size-5 text-muted-foreground" />
-              <div className="text-sm font-medium">Upload a document</div>
-              <div className="text-xs text-muted-foreground">PDF, markdown, or text</div>
+            <label className="mb-3 block cursor-pointer rounded-lg border border-dashed border-border bg-secondary/40 p-6 text-center transition-colors hover:border-brand/60 hover:bg-secondary">
+              {busy === "upload" ? (
+                <Loader2 className="mx-auto mb-2 size-6 animate-spin text-brand" />
+              ) : (
+                <Upload className="mx-auto mb-2 size-6 text-brand" />
+              )}
+              <div className="text-sm font-medium">Upload a PDF</div>
+              <div className="text-xs text-muted-foreground">or markdown / text</div>
               <input
-                ref={fileRef}
                 type="file"
                 accept=".pdf,.md,.markdown,.txt,text/*"
                 className="hidden"
                 onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])}
               />
             </label>
-
             <div className="mb-2 text-xs text-muted-foreground">Or paste a fact / snippet</div>
-            <Input
-              placeholder="title (e.g. policy_2020)"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="mb-2"
-            />
-            <Textarea
-              placeholder="e.g. Acme Robotics is headquartered in Newhaven."
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              rows={3}
-              className="mb-2"
-            />
+            <Input placeholder="title (e.g. policy_2020)" value={title} onChange={(e) => setTitle(e.target.value)} className="mb-2" />
+            <Textarea placeholder="e.g. Acme Robotics is headquartered in Newhaven." value={text} onChange={(e) => setText(e.target.value)} rows={3} className="mb-2" />
             <div className="mb-2 flex items-center gap-2">
               <span className="text-xs text-muted-foreground">Valid from</span>
-              <Input
-                type="date"
-                value={docDate}
-                onChange={(e) => setDocDate(e.target.value)}
-                className="h-8 w-auto"
-              />
+              <Input type="date" value={docDate} onChange={(e) => setDocDate(e.target.value)} className="h-8 w-auto" />
             </div>
             <div className="flex gap-2">
-              <Button size="sm" onClick={addText} disabled={!!busy || !text.trim()}>
+              <button onClick={addText} disabled={!!busy || !text.trim()} className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground disabled:opacity-40">
                 {busy === "text" ? <Loader2 className="size-4 animate-spin" /> : "Add fact"}
-              </Button>
-              <Button size="sm" variant="outline" onClick={loadDemo} disabled={!!busy}>
+              </button>
+              <button onClick={loadDemo} disabled={!!busy} className="rounded-md border border-border px-3 py-1.5 text-sm hover:bg-accent disabled:opacity-40">
                 {busy === "demo" ? <Loader2 className="size-4 animate-spin" /> : "Load demo"}
-              </Button>
+              </button>
             </div>
           </div>
 
@@ -245,7 +261,7 @@ export default function Playground() {
               )}
             </div>
             {docs.length === 0 ? (
-              <p className="text-xs text-muted-foreground">Nothing yet. Upload a doc or load the demo.</p>
+              <p className="text-xs text-muted-foreground">Nothing yet. Upload a PDF or load the demo.</p>
             ) : (
               <ul className="space-y-2">
                 {docs.map((d, i) => (
@@ -263,51 +279,23 @@ export default function Playground() {
           </div>
         </div>
 
-        {/* ASK */}
+        {/* ASK + ANSWER */}
         <div className="space-y-4">
           <div className="rounded-xl border border-border bg-card p-5 elev">
-            <Input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Ask a question about your docs…"
-              className="mb-3 h-11 text-[15px]"
-            />
+            <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Ask a question about your docs…" className="mb-3 h-11 text-[15px]" />
             <div className="flex flex-wrap items-center gap-3">
               <div className="inline-flex overflow-hidden rounded-lg border border-border">
-                <button
-                  onClick={() => setUseAsOf(false)}
-                  className={`px-3 py-1.5 text-sm ${!useAsOf ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-accent"}`}
-                >
-                  Now
-                </button>
-                <button
-                  onClick={() => setUseAsOf(true)}
-                  className={`px-3 py-1.5 text-sm ${useAsOf ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-accent"}`}
-                >
-                  As of
-                </button>
+                <button onClick={() => setUseAsOf(false)} className={`px-3 py-1.5 text-sm ${!useAsOf ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-accent"}`}>Now</button>
+                <button onClick={() => setUseAsOf(true)} className={`px-3 py-1.5 text-sm ${useAsOf ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-accent"}`}>As of</button>
               </div>
-              {useAsOf && (
-                <Input
-                  type="date"
-                  value={asOf}
-                  onChange={(e) => setAsOf(e.target.value)}
-                  className="h-9 w-auto"
-                />
-              )}
+              {useAsOf && <Input type="date" value={asOf} onChange={(e) => setAsOf(e.target.value)} className="h-9 w-auto" />}
               <div className="ml-auto flex gap-2">
-                <Button variant="outline" onClick={() => ask("context")} disabled={!!busy}>
+                <button onClick={() => ask("context")} disabled={!!busy} className="rounded-md border border-border px-4 py-2 text-sm hover:bg-accent disabled:opacity-40">
                   {busy === "context" ? <Loader2 className="size-4 animate-spin" /> : "Context"}
-                </Button>
-                <Button onClick={() => ask("answer")} disabled={!!busy}>
-                  {busy === "answer" ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : (
-                    <>
-                      <Sparkles className="size-4" /> Answer
-                    </>
-                  )}
-                </Button>
+                </button>
+                <button onClick={() => ask("answer")} disabled={!!busy} className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-40">
+                  {busy === "answer" ? <Loader2 className="size-4 animate-spin" /> : <><SendHorizontal className="size-4" /> Answer</>}
+                </button>
               </div>
             </div>
             <p className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -316,40 +304,79 @@ export default function Playground() {
             </p>
           </div>
 
-          {answer && (
-            <div className="ring-glow rounded-xl border border-border bg-card p-5">
-              <div className="mb-2 flex items-center gap-2 text-xs text-muted-foreground">
-                <Sparkles className="size-3.5 text-brand" /> Cited answer
-                {answer.generator_model && <span>· {answer.generator_model}</span>}
-              </div>
-              <p className="text-[15px] leading-relaxed">{answer.answer}</p>
-              {Object.keys(answer.confidence).length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {Object.entries(answer.confidence).map(([k, v]) => (
-                    <Badge key={k} variant="outline" className={confidenceBadgeClass(k)}>
-                      {k} ×{v}
-                    </Badge>
-                  ))}
+          <AnimatePresence>
+            {answer && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="ring-glow rounded-xl border border-brand/25 bg-card p-5"
+              >
+                <div className="mb-2 flex items-center gap-2 text-xs text-muted-foreground">
+                  <FileCheck2 className="size-3.5 text-brand" /> Cited answer
                 </div>
-              )}
-            </div>
-          )}
+                <p className="text-[15px] leading-relaxed">{answer.answer}</p>
+                {Object.keys(answer.confidence).length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {Object.entries(answer.confidence).map(([k, v]) => (
+                      <Badge key={k} variant="outline" className={confidenceBadgeClass(k)}>{k} ×{v}</Badge>
+                    ))}
+                  </div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <div className="rounded-xl border border-border bg-card p-5 elev">
             <div className="mb-3 text-sm font-semibold">
               {answer ? "Facts it stood on" : "Retrieved context"} ({facts.length})
             </div>
             {facts.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                Ask a question to see the temporally-correct facts (and their provenance).
-              </p>
+              <p className="text-sm text-muted-foreground">Ask a question to see the temporally-correct facts and their provenance.</p>
             ) : (
               <ul className="space-y-3">
-                {facts.map((f) => (
-                  <FactCard key={f.belief_id} f={f} />
-                ))}
+                {facts.map((f) => <FactCard key={f.belief_id} f={f} />)}
               </ul>
             )}
+          </div>
+        </div>
+
+        {/* LIVE PIPELINE */}
+        <div className="lg:sticky lg:top-20 lg:self-start">
+          <div className="rounded-xl border border-border bg-card p-5 elev">
+            <div className="mb-4 text-sm font-semibold">Live pipeline</div>
+            <ol className="space-y-3">
+              {STAGES.map((s, i) => {
+                const state = stage === -1 ? "idle" : stage === 5 || stage > i ? "done" : stage === i ? "active" : "idle";
+                const Icon = s.icon;
+                return (
+                  <li key={s.label} className="flex items-center gap-3">
+                    <span
+                      className={`relative flex size-8 shrink-0 items-center justify-center rounded-lg border ${
+                        state === "done" ? "border-brand/40 bg-brand/10 text-brand"
+                        : state === "active" ? "border-brand bg-brand/10 text-brand"
+                        : "border-border bg-secondary/40 text-muted-foreground"
+                      }`}
+                    >
+                      {state === "done" ? <Check className="size-4" /> : <Icon className="size-4" />}
+                      {state === "active" && (
+                        <motion.span
+                          className="absolute inset-0 rounded-lg ring-2 ring-brand/50"
+                          animate={{ opacity: [0.2, 0.7, 0.2] }}
+                          transition={{ duration: 1, repeat: Infinity }}
+                        />
+                      )}
+                    </span>
+                    <div className="min-w-0">
+                      <div className={`text-sm ${state === "idle" ? "text-muted-foreground" : "text-foreground"}`}>{s.label}</div>
+                    </div>
+                    {state === "active" && <Loader2 className="ml-auto size-3.5 animate-spin text-brand" />}
+                  </li>
+                );
+              })}
+            </ol>
+            <p className="mt-4 text-xs text-muted-foreground">
+              {stage === -1 ? "Ask a question to watch the pipeline run." : stage === 5 ? "Done — answer grounded and cited." : "Running…"}
+            </p>
           </div>
         </div>
       </div>
@@ -360,16 +387,10 @@ export default function Playground() {
 function FactCard({ f }: { f: ServedFact }) {
   return (
     <li className="rounded-lg border border-border p-3">
-      <div className={`text-sm ${f.invalid_at ? "text-muted-foreground line-through" : "text-foreground"}`}>
-        {f.statement}
-      </div>
+      <div className={`text-sm ${f.invalid_at ? "text-muted-foreground line-through" : "text-foreground"}`}>{f.statement}</div>
       <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-        <Badge variant="outline" className={confidenceBadgeClass(f.valid_at_source)}>
-          {f.valid_at_source}
-        </Badge>
-        <span>
-          valid {fmt(f.valid_at)} → {f.invalid_at ? fmt(f.invalid_at) : "present"}
-        </span>
+        <Badge variant="outline" className={confidenceBadgeClass(f.valid_at_source)}>{f.valid_at_source}</Badge>
+        <span>valid {fmt(f.valid_at)} → {f.invalid_at ? fmt(f.invalid_at) : "present"}</span>
         {f.provenance.length > 0 && <span>· source: {f.provenance.join(", ")}</span>}
       </div>
     </li>

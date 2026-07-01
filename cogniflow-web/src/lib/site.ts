@@ -11,6 +11,13 @@ export const site = {
   ],
 } as const;
 
+// Display name for benchmark systems: keep real competitor names; relabel the temporal
+// substrate ablation to a category (we don't frame ourselves as built on it).
+export function displayName(name: string): string {
+  if (name.startsWith("Graphiti")) return "Temporal graph (no as-of)";
+  return name;
+}
+
 export const chartColors = {
   brand: "#e4551c",   // Cogniflow (warm orange)
   brand2: "#f59e0b",  // amber
