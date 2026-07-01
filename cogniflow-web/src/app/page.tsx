@@ -104,7 +104,7 @@ export default function Home() {
           temporally correct &mdash; and cites the fact it stood on.
         </p>
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
-          <div className="rounded-xl border border-border bg-card p-6">
+          <div className="rounded-xl border border-border bg-card p-6 elev">
             <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-danger">
               <Minus className="size-4" /> Plain RAG
             </div>
@@ -113,7 +113,7 @@ export default function Home() {
               (&ldquo;conflicting information&rdquo;) or picks the wrong one.
             </p>
           </div>
-          <div className="ring-glow rounded-xl border border-border bg-card p-6">
+          <div className="ring-glow rounded-xl border border-border bg-card p-6 elev">
             <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-brand">
               <Check className="size-4" /> Cogniflow · as of 2015
             </div>
@@ -134,7 +134,7 @@ export default function Home() {
           structurally can&rsquo;t, for the regulated buyer who can&rsquo;t send data out. We tie
           on retrieval; we win where they&rsquo;re blank.
         </p>
-        <div className="mt-8 overflow-hidden rounded-xl border border-border">
+        <div className="mt-8 overflow-hidden rounded-xl border border-border bg-card elev">
           <table className="w-full text-left text-sm">
             <thead className="bg-secondary/50 text-xs uppercase tracking-wide text-muted-foreground">
               <tr>
@@ -186,7 +186,7 @@ export default function Home() {
           from training).
         </p>
         <div className="mt-8 grid gap-6 lg:grid-cols-[1.3fr_1fr]">
-          <div className="rounded-xl border border-border bg-card p-6">
+          <div className="rounded-xl border border-border bg-card p-6 elev">
             <BenchmarkChart data={panels} />
           </div>
           <div className="flex flex-col justify-center gap-4">
@@ -212,7 +212,7 @@ export default function Home() {
       <Section eyebrow="Honesty is the marketing" title="What we are — and what we're not">
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           {boundaries.map((b) => (
-            <div key={b.t} className="rounded-xl border border-border bg-card p-6">
+            <div key={b.t} className="rounded-xl border border-border bg-card p-6 elev">
               <h3 className="text-headline mb-2">{b.t}</h3>
               <p className="text-sm text-muted-foreground">{b.d}</p>
             </div>
@@ -278,7 +278,7 @@ function Row({ k, v, good, bad }: { k: string; v: string; good?: boolean; bad?: 
 
 function Stat({ label, a, b, tie }: { label: string; a: string; b: string; tie?: boolean }) {
   return (
-    <div className="rounded-lg border border-border bg-card p-4">
+    <div className="rounded-lg border border-border bg-card p-4 elev">
       <div className="text-xs text-muted-foreground">{label}</div>
       <div className="mt-1 flex items-center gap-3 text-sm">
         <span className={tie ? "text-warn" : "text-danger"}>{a}</span>
