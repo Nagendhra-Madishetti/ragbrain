@@ -3,7 +3,7 @@
   "systems": [
     {
       "name": "Cogniflow",
-      "kind": "temporal \u00b7 as-of",
+      "kind": "bi-temporal \u00b7 as-of",
       "standard": {
         "n": 4,
         "score": 4,

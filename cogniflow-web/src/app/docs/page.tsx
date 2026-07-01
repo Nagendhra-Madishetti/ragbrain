@@ -58,7 +58,7 @@ export default function DocsPage() {
         <div className="min-w-0">
           <Doc id="overview" title="Overview">
             <p>
-              Cogniflow is a <b>temporal RAG platform</b>: a complete pipeline from any document
+              Cogniflow is a <b>bi-temporal RAG platform</b>: a complete pipeline from any document
               to a cited, temporally-correct answer, with a memory that records not just what is
               true, but <b>when</b> it was true and when the system learned it. It answers
               &ldquo;as of&rdquo; any past date, replays what it knew at any moment, and traces
@@ -119,7 +119,7 @@ pnpm -C cogniflow-web start   # or deploy the build output to your host`}</Code>
           <Doc id="using" title="Using the platform">
             <p>
               <b>Ingest.</b> Upload a PDF, markdown, or text document with the date its facts
-              were true. Cogniflow parses, chunks, embeds, and writes each fact into the temporal
+              were true. Cogniflow parses, chunks, embeds, and writes each fact into the bi-temporal
               store; re-ingesting an updated document supersedes the old fact (both stamps).
             </p>
             <p>
@@ -138,7 +138,7 @@ pnpm -C cogniflow-web start   # or deploy the build output to your host`}</Code>
             <p>One pipeline, every stage pluggable:</p>
             <ul className="list-disc space-y-1 pl-5">
               <li><b>Ingest</b> — parse + structure-preserving chunk + embed.</li>
-              <li><b>Temporal knowledge graph</b> — facts stored <b>bi-temporally</b>: event time (when true) and system time (when learned).</li>
+              <li><b>Bi-temporal knowledge graph</b> — facts stored <b>bi-temporally</b>: event time (when true) and system time (when learned).</li>
               <li><b>As-of retrieval</b> — validity-filter context to a point in time before ranking.</li>
               <li><b>Rerank</b> — optional cross-encoder, off by default.</li>
               <li><b>Grounded generation</b> — answer only from retrieved facts.</li>

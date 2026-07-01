@@ -163,7 +163,7 @@ async def main() -> None:
     li = make_llamaindex()
 
     systems = [
-        ("Cogniflow", "temporal · as-of", "async", cogniflow),
+        ("Cogniflow", "bi-temporal · as-of", "async", cogniflow),
         ("Graphiti (substrate, no as-of)", "temporal · ablation", "async", ablation),
         ("LlamaIndex", "vector RAG", "sync", li),
         ("LangChain", "BM25 RAG", "sync", lc),

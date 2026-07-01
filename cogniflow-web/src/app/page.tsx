@@ -20,7 +20,7 @@ const asofData: SysDatum[] = systems.map((s) => ({ name: displayName(s.name), sc
 const boundaries = [
   {
     t: "Provider-agnostic by design",
-    d: "The LLM, embedder, reranker, and graph backend are plugins — bring a hosted API or a local model. Nothing is hard-wired to a vendor. The temporal platform is the product.",
+    d: "The LLM, embedder, reranker, and graph backend are plugins — bring a hosted API or a local model. Nothing is hard-wired to a vendor. The bi-temporal platform is the product.",
   },
   {
     t: "Structured input is deterministic",
@@ -39,7 +39,7 @@ export default function Home() {
       <section className="relative overflow-hidden">
         <div className="relative mx-auto max-w-6xl px-5 pb-16 pt-20 sm:pt-28">
           <Reveal>
-            <p className="eyebrow mb-5">Temporal RAG platform · self-hostable · open source</p>
+            <p className="eyebrow mb-5">Bi-temporal RAG platform · self-hostable · open source</p>
           </Reveal>
           <Reveal delay={0.05}>
             <h1 className="text-hero max-w-[18ch]">
@@ -88,7 +88,7 @@ export default function Home() {
             <p className="eyebrow mb-4">The infrastructure</p>
             <h2 className="text-section max-w-[24ch]">One pipeline, from any document to a cited, temporally-correct answer</h2>
             <p className="text-subhead mt-4 max-w-[62ch]">
-              Every stage is ours and every stage is pluggable. The temporal knowledge graph at
+              Every stage is ours and every stage is pluggable. The bi-temporal knowledge graph at
               the center is what lets the platform answer &ldquo;as of when.&rdquo;
             </p>
           </Reveal>

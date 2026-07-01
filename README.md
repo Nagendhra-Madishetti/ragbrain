@@ -1,6 +1,6 @@
 # Cogniflow
 
-**Temporal, self-falsifying belief substrate for agentic RAG.** The combination of a
+**Bi-temporal, self-falsifying belief substrate for agentic RAG.** The combination of a
 bi-temporal knowledge graph (à la Graphiti) with an agentic retrieval loop (à la
 LlamaIndex), welded by a closed feedback loop: retrieve → check validity → falsify
 superseded beliefs → persist the verdict → reshape the next retrieval.

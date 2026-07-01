@@ -9,7 +9,7 @@ export function Footer() {
         <div className="space-y-2">
           <Logo />
           <p className="max-w-sm text-sm text-muted-foreground">
-            Temporal, self-falsifying belief substrate for agentic RAG. Apache-2.0. Every
+            Bi-temporal, self-falsifying belief substrate for agentic RAG. Apache-2.0. Every
             number on this site comes from a live run &mdash; none fabricated.
           </p>
         </div>

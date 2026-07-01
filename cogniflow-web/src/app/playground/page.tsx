@@ -232,7 +232,7 @@ export default function Playground() {
       <p className="text-subhead mb-8 max-w-[62ch]">
         Drop in your own PDFs (or paste text) with the date each was true, then ask &mdash; and
         move the <b>as-of</b> date to watch the answer change with time. Real ingestion, real
-        temporal store, live on the right.
+        bi-temporal store, live on the right.
       </p>
 
       {down && (
