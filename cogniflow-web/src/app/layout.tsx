@@ -28,7 +28,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       className={`${inter.variable} ${spaceGrotesk.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="mesh-bg flex min-h-full flex-col">
+      <body className="flex min-h-full flex-col">
+        <div className="boxes-layer" aria-hidden />
         <Nav />
         <main className="flex-1">{children}</main>
         <Footer />

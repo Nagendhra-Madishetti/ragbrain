@@ -53,8 +53,7 @@ export default function Home() {
     <>
       {/* HERO */}
       <section className="relative overflow-hidden">
-        <div className="grid-overlay pointer-events-none absolute inset-0" />
-        <div className="relative mx-auto max-w-6xl px-5 pb-24 pt-20 sm:pt-28">
+        <div className="relative mx-auto max-w-6xl px-5 pb-20 pt-20 sm:pt-28">
           <p className="eyebrow mb-5">Self-hostable · Apache-2.0 · Graphiti × LlamaIndex</p>
           <h1 className="text-hero max-w-[18ch]">
             The <span className="text-gradient">auditable, self-hostable</span> belief ledger
@@ -257,8 +256,8 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="border-t border-border">
-      <div className="mx-auto max-w-6xl px-5 py-20 sm:py-24">
+    <section className="mx-auto max-w-6xl px-5 py-8">
+      <div className="section-box p-7 sm:p-10">
         <p className="eyebrow mb-4">{eyebrow}</p>
         <h2 className="text-section max-w-[24ch]">{title}</h2>
         <div className="mt-6">{children}</div>
