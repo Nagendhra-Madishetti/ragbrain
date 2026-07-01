@@ -48,6 +48,7 @@ def _ensure_loaded() -> None:
     _LOADED = True
     from . import (
         core,  # noqa: F401  (triggers cogniflow.core.policies registration)
+        rerankers,  # noqa: F401  (registers retrieval: reranker; stdlib-only, no heavy deps)
         verification,  # noqa: F401  (registers falsification: llm)
     )
 

@@ -18,6 +18,13 @@ def _dt(year: int) -> datetime:
     return datetime(year, 1, 1, tzinfo=timezone.utc)
 
 
+class _FakeCrossEncoder:
+    """Deterministic scorer so the reranker policy conforms without an external model."""
+
+    def score(self, query: str, passages: list[str]) -> list[float]:
+        return [float(len(p)) for p in passages]
+
+
 @pytest.mark.parametrize(
     "family,name",
     [
@@ -27,8 +34,14 @@ def _dt(year: int) -> datetime:
     ],
 )
 def test_reference_policy_passes_conformance(family: str, name: str) -> None:
-    # grace_window needs a param; others construct with defaults.
-    kwargs = {"grace_days": 30} if name == "grace_window" else {}
+    # grace_window needs a param; the reranker needs a cross-encoder (an external model, here
+    # a deterministic fake); others construct with defaults.
+    if name == "grace_window":
+        kwargs = {"grace_days": 30}
+    elif name == "reranker":
+        kwargs = {"cross_encoder": _FakeCrossEncoder()}
+    else:
+        kwargs = {}
     policy = create_policy(family, name, **kwargs)
     assert_policy_conforms(family, policy)
 

@@ -1,0 +1,337 @@
+{
+  "captured_at": "2026-07-01T04:05:27.510085+00:00",
+  "corpus_size": 10,
+  "as_of_headline": {
+    "query": "Where is Tesla headquartered?",
+    "now": {
+      "answer": "Tesla is headquartered in Austin.",
+      "confidence": {
+        "derived": 5
+      },
+      "facts": [
+        {
+          "belief_id": "08ef9c8b-1ef5-44d1-9d81-36a773a7e3e6",
+          "statement": "Tesla is headquartered in Austin",
+          "valid_at": "2021-01-01T00:00:00+00:00",
+          "invalid_at": null,
+          "valid_at_source": "derived",
+          "valid_at_source_raw": "okf:timestamp",
+          "provenance": [
+            "tesla_hq_new"
+          ],
+          "superseded_by": null,
+          "score": 0.248046875
+        },
+        {
+          "belief_id": "0afce592-f029-4e8d-a4e5-0adceaa25472",
+          "statement": "X Corp is headquartered in San Francisco",
+          "valid_at": "2007-01-01T00:00:00+00:00",
+          "invalid_at": null,
+          "valid_at_source": "derived",
+          "valid_at_source_raw": "okf:timestamp",
+          "provenance": [
+            "x_hq"
+          ],
+          "superseded_by": null,
+          "score": -8.0859375
+        },
+        {
+          "belief_id": "72bb3011-abc8-4363-96bb-13668806b270",
+          "statement": "Lucid Motors is headquartered in Newark",
+          "valid_at": "2016-01-01T00:00:00+00:00",
+          "invalid_at": null,
+          "valid_at_source": "derived",
+          "valid_at_source_raw": "okf:timestamp",
+          "provenance": [
+            "lucid_hq"
+          ],
+          "superseded_by": null,
+          "score": -10.015625
+        },
+        {
+          "belief_id": "7758a8e8-4daa-4a0b-bc87-0509169c21be",
+          "statement": "Tesla makes the Model 3 electric car",
+          "valid_at": "2017-01-01T00:00:00+00:00",
+          "invalid_at": null,
+          "valid_at_source": "derived",
+          "valid_at_source_raw": "okf:timestamp",
+          "provenance": [
+            "tesla_model3"
+          ],
+          "superseded_by": null,
+          "score": -10.984375
+        },
+        {
+          "belief_id": "2c48db33-72b8-42d2-9dbf-e16f3e0584ba",
+          "statement": "Rivian is headquartered in Irvine",
+          "valid_at": "2009-01-01T00:00:00+00:00",
+          "invalid_at": null,
+          "valid_at_source": "derived",
+          "valid_at_source_raw": "okf:timestamp",
+          "provenance": [
+            "rivian_hq"
+          ],
+          "superseded_by": null,
+          "score": -11.9140625
+        }
+      ]
+    },
+    "past_2015": {
+      "answer": "According to the context facts, Tesla is headquartered in **Palo Alto**.\n\nSource: tesla_hq_old (valid from 2010-01-01)",
+      "confidence": {
+        "derived": 4
+      },
+      "facts": [
+        {
+          "belief_id": "fdfef0c2-9344-416a-8123-4dd5fdb7cfdd",
+          "statement": "Tesla is headquartered in Palo Alto",
+          "valid_at": "2010-01-01T00:00:00+00:00",
+          "invalid_at": "2021-01-01T00:00:00+00:00",
+          "valid_at_source": "derived",
+          "valid_at_source_raw": "okf:timestamp",
+          "provenance": [
+            "tesla_hq_old"
+          ],
+          "superseded_by": "08ef9c8b-1ef5-44d1-9d81-36a773a7e3e6",
+          "score": 5.80078125
+        },
+        {
+          "belief_id": "0afce592-f029-4e8d-a4e5-0adceaa25472",
+          "statement": "X Corp is headquartered in San Francisco",
+          "valid_at": "2007-01-01T00:00:00+00:00",
+          "invalid_at": null,
+          "valid_at_source": "derived",
+          "valid_at_source_raw": "okf:timestamp",
+          "provenance": [
+            "x_hq"
+          ],
+          "superseded_by": null,
+          "score": -8.0859375
+        },
+        {
+          "belief_id": "2c48db33-72b8-42d2-9dbf-e16f3e0584ba",
+          "statement": "Rivian is headquartered in Irvine",
+          "valid_at": "2009-01-01T00:00:00+00:00",
+          "invalid_at": null,
+          "valid_at_source": "derived",
+          "valid_at_source_raw": "okf:timestamp",
+          "provenance": [
+            "rivian_hq"
+          ],
+          "superseded_by": null,
+          "score": -11.9140625
+        },
+        {
+          "belief_id": "cc6a01ad-a673-4c86-bc81-8cdb85da89e1",
+          "statement": "Oracle is headquartered in Redwood City",
+          "valid_at": "1977-01-01T00:00:00+00:00",
+          "invalid_at": "2020-01-01T00:00:00+00:00",
+          "valid_at_source": "derived",
+          "valid_at_source_raw": "okf:timestamp",
+          "provenance": [
+            "oracle_hq_old"
+          ],
+          "superseded_by": "4abb5ae5-baa5-4327-a1a9-f99fa41d25eb",
+          "score": -12.046875
+        }
+      ]
+    },
+    "plain_rag_note": "Plain RAG has no as-of axis: it cannot answer the 2015 case at all."
+  },
+  "reranker": {
+    "model": "nvidia-rerank (measures the plug; default self-hosted = bge-reranker-v2-m3)",
+    "golden_size": 8,
+    "off": {
+      "top1": 7,
+      "mrr": 0.9,
+      "runs": [
+        {
+          "query": "Where is Tesla headquartered?",
+          "expect_company": "Tesla",
+          "ranked": [
+            "Tesla is headquartered in Austin",
+            "Tesla makes the Model 3 electric car",
+            "X Corp is headquartered in San Francisco",
+            "Oracle is headquartered in Austin",
+            "Rivian is headquartered in Irvine"
+          ]
+        },
+        {
+          "query": "Where is Rivian's head office?",
+          "expect_company": "Rivian",
+          "ranked": [
+            "Rivian is headquartered in Irvine",
+            "Rivian makes the R1T electric truck",
+            "X Corp is headquartered in San Francisco",
+            "Oracle is headquartered in Austin",
+            "Tesla is headquartered in Austin"
+          ]
+        },
+        {
+          "query": "In which city is Lucid Motors based?",
+          "expect_company": "Lucid",
+          "ranked": [
+            "Lucid Motors is headquartered in Newark",
+            "Tesla is headquartered in Austin",
+            "X Corp is headquartered in San Francisco",
+            "Oracle is headquartered in Austin",
+            "Tesla makes the Model 3 electric car"
+          ]
+        },
+        {
+          "query": "Where does Palantir have its headquarters?",
+          "expect_company": "Palantir",
+          "ranked": [
+            "Palantir is headquartered in Denver",
+            "X Corp is headquartered in San Francisco",
+            "Oracle is headquartered in Austin",
+            "Rivian is headquartered in Irvine",
+            "Lucid Motors is headquartered in Newark"
+          ]
+        },
+        {
+          "query": "Where is the maker of the R1T truck based?",
+          "expect_company": "Rivian",
+          "ranked": [
+            "Rivian makes the R1T electric truck",
+            "Lucid Motors is headquartered in Newark",
+            "Tesla is headquartered in Austin",
+            "X Corp is headquartered in San Francisco",
+            "Palantir is headquartered in Denver"
+          ]
+        },
+        {
+          "query": "Which enterprise database company relocated to Texas?",
+          "expect_company": "Oracle",
+          "ranked": [
+            "Oracle is headquartered in Austin",
+            "Tesla is headquartered in Austin",
+            "X Corp is headquartered in San Francisco",
+            "Rivian is headquartered in Irvine",
+            "Palantir is headquartered in Denver"
+          ]
+        },
+        {
+          "query": "Which electric-truck company is based in Southern California?",
+          "expect_company": "Rivian",
+          "ranked": [
+            "Rivian makes the R1T electric truck",
+            "Tesla makes the Model 3 electric car",
+            "Tesla is headquartered in Austin",
+            "Lucid Motors is headquartered in Newark",
+            "X Corp is headquartered in San Francisco"
+          ]
+        },
+        {
+          "query": "Which data-analytics firm is headquartered in the Mile High City?",
+          "expect_company": "Palantir",
+          "ranked": [
+            "Oracle is headquartered in Austin",
+            "X Corp is headquartered in San Francisco",
+            "Lucid Motors is headquartered in Newark",
+            "Tesla is headquartered in Austin",
+            "Palantir is headquartered in Denver"
+          ]
+        }
+      ]
+    },
+    "on": {
+      "top1": 8,
+      "mrr": 1.0,
+      "runs": [
+        {
+          "query": "Where is Tesla headquartered?",
+          "expect_company": "Tesla",
+          "ranked": [
+            "Tesla is headquartered in Austin",
+            "X Corp is headquartered in San Francisco",
+            "Lucid Motors is headquartered in Newark",
+            "Tesla makes the Model 3 electric car",
+            "Rivian is headquartered in Irvine"
+          ]
+        },
+        {
+          "query": "Where is Rivian's head office?",
+          "expect_company": "Rivian",
+          "ranked": [
+            "Rivian is headquartered in Irvine",
+            "Rivian makes the R1T electric truck",
+            "Lucid Motors is headquartered in Newark",
+            "Tesla is headquartered in Austin",
+            "X Corp is headquartered in San Francisco"
+          ]
+        },
+        {
+          "query": "In which city is Lucid Motors based?",
+          "expect_company": "Lucid",
+          "ranked": [
+            "Lucid Motors is headquartered in Newark",
+            "X Corp is headquartered in San Francisco",
+            "Rivian is headquartered in Irvine",
+            "Tesla is headquartered in Austin",
+            "Palantir is headquartered in Denver"
+          ]
+        },
+        {
+          "query": "Where does Palantir have its headquarters?",
+          "expect_company": "Palantir",
+          "ranked": [
+            "Palantir is headquartered in Denver",
+            "X Corp is headquartered in San Francisco",
+            "Oracle is headquartered in Austin",
+            "Tesla is headquartered in Austin",
+            "Lucid Motors is headquartered in Newark"
+          ]
+        },
+        {
+          "query": "Where is the maker of the R1T truck based?",
+          "expect_company": "Rivian",
+          "ranked": [
+            "Rivian makes the R1T electric truck",
+            "Rivian is headquartered in Irvine",
+            "Lucid Motors is headquartered in Newark",
+            "Tesla is headquartered in Austin",
+            "X Corp is headquartered in San Francisco"
+          ]
+        },
+        {
+          "query": "Which enterprise database company relocated to Texas?",
+          "expect_company": "Oracle",
+          "ranked": [
+            "Oracle is headquartered in Austin",
+            "Palantir is headquartered in Denver",
+            "Tesla is headquartered in Austin",
+            "X Corp is headquartered in San Francisco",
+            "Rivian is headquartered in Irvine"
+          ]
+        },
+        {
+          "query": "Which electric-truck company is based in Southern California?",
+          "expect_company": "Rivian",
+          "ranked": [
+            "Rivian is headquartered in Irvine",
+            "Rivian makes the R1T electric truck",
+            "Lucid Motors is headquartered in Newark",
+            "Tesla is headquartered in Austin",
+            "X Corp is headquartered in San Francisco"
+          ]
+        },
+        {
+          "query": "Which data-analytics firm is headquartered in the Mile High City?",
+          "expect_company": "Palantir",
+          "ranked": [
+            "Palantir is headquartered in Denver",
+            "X Corp is headquartered in San Francisco",
+            "Oracle is headquartered in Austin",
+            "Tesla is headquartered in Austin",
+            "Rivian is headquartered in Irvine"
+          ]
+        }
+      ]
+    }
+  },
+  "weak_context": {
+    "query": "What was Tesla's annual revenue in 2019?",
+    "answer": "I do not have that information. The context facts provided do not include any data about Tesla's annual revenue in 2019."
+  }
+}

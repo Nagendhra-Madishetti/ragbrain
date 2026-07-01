@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cogniflow - the RAG that knows *when*</title>
+<style>
+ body{font:15px/1.6 system-ui,sans-serif;margin:0;background:#0f1115;color:#e8eaed}
+ .wrap{max-width:920px;margin:0 auto;padding:28px 20px 60px}
+ h1{font-size:24px;margin:0 0 4px} .tag{color:#9aa4b2;margin:0 0 24px}
+ .card{background:#161922;border:1px solid #262a35;border-radius:12px;padding:18px 20px;margin:16px 0}
+ .lead{border-color:#2c5cff55;background:#111a33}
+ h2{font-size:15px;letter-spacing:.03em;text-transform:uppercase;color:#9aa4b2;margin:0 0 12px}
+ .q{font-weight:600;color:#cdd6e4;margin-bottom:10px}
+ .row{display:flex;gap:12px;margin:8px 0;align-items:baseline}
+ .k{flex:0 0 118px;color:#9aa4b2;font-size:13px}
+ .a{flex:1} .a b{color:#7fd1a8}
+ .bad{color:#e07a86}
+ .badge{display:inline-block;font-size:11px;padding:1px 8px;border-radius:10px;margin-left:6px}
+ .derived{background:#3d3414;color:#e2c04b} .authoritative{background:#143d2b;color:#56d39a}
+ .none{background:#33181c;color:#e07a86}
+ table{width:100%;border-collapse:collapse;margin-top:8px} td,th{padding:6px 8px;text-align:left;border-bottom:1px solid #262a35;font-size:14px}
+ .lift{color:#56d39a;font-weight:600}
+ .fact{font-size:13px;color:#b7c0cf;border-left:2px solid #2c3140;padding-left:10px;margin:6px 0}
+ code{background:#0f1115;border:1px solid #262a35;border-radius:5px;padding:1px 5px;font-size:13px}
+ .foot{color:#9aa4b2;font-size:13px;margin-top:22px}
+ a{color:#7aa2ff}
+</style></head>
+<body><div class="wrap">
+<h1>Cogniflow &mdash; the RAG that knows <em>when</em></h1>
+<p class="tag">Same corpus, same model. The only difference is memory. A real captured run &mdash; not a mockup.</p>
+
+<div class="card lead">
+ <h2>The one thing plain RAG can't do: answer "as of"</h2>
+ <div class="q" id="q"></div>
+ <div class="row"><div class="k">Cogniflow &mdash; now</div><div class="a" id="now"></div></div>
+ <div class="row"><div class="k">Cogniflow &mdash; as of 2015</div><div class="a" id="past"></div></div>
+ <div class="row"><div class="k bad">Plain RAG</div><div class="a bad" id="plain"></div></div>
+</div>
+
+<div class="card">
+ <h2>A cited answer that knows how sure it is</h2>
+ <div class="tag">The "now" answer stands on these facts (each labeled by confidence + source):</div>
+ <div id="facts"></div>
+</div>
+
+<div class="card">
+ <h2>Reranker &mdash; measured on a confusable corpus, not assumed</h2>
+ <div class="tag" id="rr-note"></div>
+ <table><thead><tr><th>configuration</th><th>top-1</th><th>MRR</th></tr></thead>
+ <tbody id="rr"></tbody></table>
+ <div class="tag" id="rr-verdict" style="margin-top:10px"></div>
+</div>
+
+<div class="card">
+ <h2>Faithful under thin context</h2>
+ <div class="q" id="weakq"></div><div class="a" id="weak"></div>
+</div>
+
+<p class="foot" id="foot"></p>
+</div>
+<script>
+const D = {"captured_at": "2026-07-01T04:05:27.510085+00:00", "corpus_size": 10, "as_of_headline": {"query": "Where is Tesla headquartered?", "now": {"answer": "Tesla is headquartered in Austin.", "confidence": {"derived": 5}, "facts": [{"belief_id": "08ef9c8b-1ef5-44d1-9d81-36a773a7e3e6", "statement": "Tesla is headquartered in Austin", "valid_at": "2021-01-01T00:00:00+00:00", "invalid_at": null, "valid_at_source": "derived", "valid_at_source_raw": "okf:timestamp", "provenance": ["tesla_hq_new"], "superseded_by": null, "score": 0.248046875}, {"belief_id": "0afce592-f029-4e8d-a4e5-0adceaa25472", "statement": "X Corp is headquartered in San Francisco", "valid_at": "2007-01-01T00:00:00+00:00", "invalid_at": null, "valid_at_source": "derived", "valid_at_source_raw": "okf:timestamp", "provenance": ["x_hq"], "superseded_by": null, "score": -8.0859375}, {"belief_id": "72bb3011-abc8-4363-96bb-13668806b270", "statement": "Lucid Motors is headquartered in Newark", "valid_at": "2016-01-01T00:00:00+00:00", "invalid_at": null, "valid_at_source": "derived", "valid_at_source_raw": "okf:timestamp", "provenance": ["lucid_hq"], "superseded_by": null, "score": -10.015625}, {"belief_id": "7758a8e8-4daa-4a0b-bc87-0509169c21be", "statement": "Tesla makes the Model 3 electric car", "valid_at": "2017-01-01T00:00:00+00:00", "invalid_at": null, "valid_at_source": "derived", "valid_at_source_raw": "okf:timestamp", "provenance": ["tesla_model3"], "superseded_by": null, "score": -10.984375}, {"belief_id": "2c48db33-72b8-42d2-9dbf-e16f3e0584ba", "statement": "Rivian is headquartered in Irvine", "valid_at": "2009-01-01T00:00:00+00:00", "invalid_at": null, "valid_at_source": "derived", "valid_at_source_raw": "okf:timestamp", "provenance": ["rivian_hq"], "superseded_by": null, "score": -11.9140625}]}, "past_2015": {"answer": "According to the context facts, Tesla is headquartered in **Palo Alto**.\n\nSource: tesla_hq_old (valid from 2010-01-01)", "confidence": {"derived": 4}, "facts": [{"belief_id": "fdfef0c2-9344-416a-8123-4dd5fdb7cfdd", "statement": "Tesla is headquartered in Palo Alto", "valid_at": "2010-01-01T00:00:00+00:00", "invalid_at": "2021-01-01T00:00:00+00:00", "valid_at_source": "derived", "valid_at_source_raw": "okf:timestamp", "provenance": ["tesla_hq_old"], "superseded_by": "08ef9c8b-1ef5-44d1-9d81-36a773a7e3e6", "score": 5.80078125}, {"belief_id": "0afce592-f029-4e8d-a4e5-0adceaa25472", "statement": "X Corp is headquartered in San Francisco", "valid_at": "2007-01-01T00:00:00+00:00", "invalid_at": null, "valid_at_source": "derived", "valid_at_source_raw": "okf:timestamp", "provenance": ["x_hq"], "superseded_by": null, "score": -8.0859375}, {"belief_id": "2c48db33-72b8-42d2-9dbf-e16f3e0584ba", "statement": "Rivian is headquartered in Irvine", "valid_at": "2009-01-01T00:00:00+00:00", "invalid_at": null, "valid_at_source": "derived", "valid_at_source_raw": "okf:timestamp", "provenance": ["rivian_hq"], "superseded_by": null, "score": -11.9140625}, {"belief_id": "cc6a01ad-a673-4c86-bc81-8cdb85da89e1", "statement": "Oracle is headquartered in Redwood City", "valid_at": "1977-01-01T00:00:00+00:00", "invalid_at": "2020-01-01T00:00:00+00:00", "valid_at_source": "derived", "valid_at_source_raw": "okf:timestamp", "provenance": ["oracle_hq_old"], "superseded_by": "4abb5ae5-baa5-4327-a1a9-f99fa41d25eb", "score": -12.046875}]}, "plain_rag_note": "Plain RAG has no as-of axis: it cannot answer the 2015 case at all."}, "reranker": {"model": "nvidia-rerank (measures the plug; default self-hosted = bge-reranker-v2-m3)", "golden_size": 8, "off": {"top1": 7, "mrr": 0.9, "runs": [{"query": "Where is Tesla headquartered?", "expect_company": "Tesla", "ranked": ["Tesla is headquartered in Austin", "Tesla makes the Model 3 electric car", "X Corp is headquartered in San Francisco", "Oracle is headquartered in Austin", "Rivian is headquartered in Irvine"]}, {"query": "Where is Rivian's head office?", "expect_company": "Rivian", "ranked": ["Rivian is headquartered in Irvine", "Rivian makes the R1T electric truck", "X Corp is headquartered in San Francisco", "Oracle is headquartered in Austin", "Tesla is headquartered in Austin"]}, {"query": "In which city is Lucid Motors based?", "expect_company": "Lucid", "ranked": ["Lucid Motors is headquartered in Newark", "Tesla is headquartered in Austin", "X Corp is headquartered in San Francisco", "Oracle is headquartered in Austin", "Tesla makes the Model 3 electric car"]}, {"query": "Where does Palantir have its headquarters?", "expect_company": "Palantir", "ranked": ["Palantir is headquartered in Denver", "X Corp is headquartered in San Francisco", "Oracle is headquartered in Austin", "Rivian is headquartered in Irvine", "Lucid Motors is headquartered in Newark"]}, {"query": "Where is the maker of the R1T truck based?", "expect_company": "Rivian", "ranked": ["Rivian makes the R1T electric truck", "Lucid Motors is headquartered in Newark", "Tesla is headquartered in Austin", "X Corp is headquartered in San Francisco", "Palantir is headquartered in Denver"]}, {"query": "Which enterprise database company relocated to Texas?", "expect_company": "Oracle", "ranked": ["Oracle is headquartered in Austin", "Tesla is headquartered in Austin", "X Corp is headquartered in San Francisco", "Rivian is headquartered in Irvine", "Palantir is headquartered in Denver"]}, {"query": "Which electric-truck company is based in Southern California?", "expect_company": "Rivian", "ranked": ["Rivian makes the R1T electric truck", "Tesla makes the Model 3 electric car", "Tesla is headquartered in Austin", "Lucid Motors is headquartered in Newark", "X Corp is headquartered in San Francisco"]}, {"query": "Which data-analytics firm is headquartered in the Mile High City?", "expect_company": "Palantir", "ranked": ["Oracle is headquartered in Austin", "X Corp is headquartered in San Francisco", "Lucid Motors is headquartered in Newark", "Tesla is headquartered in Austin", "Palantir is headquartered in Denver"]}]}, "on": {"top1": 8, "mrr": 1.0, "runs": [{"query": "Where is Tesla headquartered?", "expect_company": "Tesla", "ranked": ["Tesla is headquartered in Austin", "X Corp is headquartered in San Francisco", "Lucid Motors is headquartered in Newark", "Tesla makes the Model 3 electric car", "Rivian is headquartered in Irvine"]}, {"query": "Where is Rivian's head office?", "expect_company": "Rivian", "ranked": ["Rivian is headquartered in Irvine", "Rivian makes the R1T electric truck", "Lucid Motors is headquartered in Newark", "Tesla is headquartered in Austin", "X Corp is headquartered in San Francisco"]}, {"query": "In which city is Lucid Motors based?", "expect_company": "Lucid", "ranked": ["Lucid Motors is headquartered in Newark", "X Corp is headquartered in San Francisco", "Rivian is headquartered in Irvine", "Tesla is headquartered in Austin", "Palantir is headquartered in Denver"]}, {"query": "Where does Palantir have its headquarters?", "expect_company": "Palantir", "ranked": ["Palantir is headquartered in Denver", "X Corp is headquartered in San Francisco", "Oracle is headquartered in Austin", "Tesla is headquartered in Austin", "Lucid Motors is headquartered in Newark"]}, {"query": "Where is the maker of the R1T truck based?", "expect_company": "Rivian", "ranked": ["Rivian makes the R1T electric truck", "Rivian is headquartered in Irvine", "Lucid Motors is headquartered in Newark", "Tesla is headquartered in Austin", "X Corp is headquartered in San Francisco"]}, {"query": "Which enterprise database company relocated to Texas?", "expect_company": "Oracle", "ranked": ["Oracle is headquartered in Austin", "Palantir is headquartered in Denver", "Tesla is headquartered in Austin", "X Corp is headquartered in San Francisco", "Rivian is headquartered in Irvine"]}, {"query": "Which electric-truck company is based in Southern California?", "expect_company": "Rivian", "ranked": ["Rivian is headquartered in Irvine", "Rivian makes the R1T electric truck", "Lucid Motors is headquartered in Newark", "Tesla is headquartered in Austin", "X Corp is headquartered in San Francisco"]}, {"query": "Which data-analytics firm is headquartered in the Mile High City?", "expect_company": "Palantir", "ranked": ["Palantir is headquartered in Denver", "X Corp is headquartered in San Francisco", "Oracle is headquartered in Austin", "Tesla is headquartered in Austin", "Rivian is headquartered in Irvine"]}]}}, "weak_context": {"query": "What was Tesla's annual revenue in 2019?", "answer": "I do not have that information. The context facts provided do not include any data about Tesla's annual revenue in 2019."}};
+const badge = s => `<span class="badge ${s}">${s}</span>`;
+const conf = c => Object.entries(c||{}).map(([k,v])=>`${badge(k)}&times;${v}`).join(" ");
+document.getElementById("q").textContent = D.as_of_headline.query;
+document.getElementById("now").innerHTML = `<b>${D.as_of_headline.now.answer}</b> ${conf(D.as_of_headline.now.confidence)}`;
+document.getElementById("past").innerHTML = `<b>${D.as_of_headline.past_2015.answer}</b> ${conf(D.as_of_headline.past_2015.confidence)}`;
+document.getElementById("plain").textContent = D.as_of_headline.plain_rag_note;
+document.getElementById("facts").innerHTML = (D.as_of_headline.now.facts||[]).map(f =>
+  `<div class="fact">${f.statement} ${badge(f.valid_at_source)} <span style="color:#6b7480">source: ${(f.provenance||[]).join(", ")||"-"}</span></div>`).join("");
+const rr = D.reranker;
+document.getElementById("rr-note").textContent = `Golden set n=${rr.golden_size}. Reranker: ${rr.model}.`;
+document.getElementById("rr").innerHTML =
+  `<tr><td>retrieval only (BGE-M3, reranker OFF)</td><td>${rr.off.top1}/${rr.golden_size}</td><td>${rr.off.mrr}</td></tr>`+
+  `<tr><td>+ reranker ON</td><td>${rr.on.top1}/${rr.golden_size}</td><td>${rr.on.mrr}</td></tr>`;
+const dTop1 = rr.on.top1 - rr.off.top1, dMrr = (rr.on.mrr - rr.off.mrr).toFixed(3);
+document.getElementById("rr-verdict").innerHTML = dTop1>0 || dMrr>0
+  ? `<span class="lift">Lift: top-1 +${dTop1}, MRR +${dMrr}</span> on hard indirect queries &mdash; the reranker earns its place as an opt-in quality tier (off by default for the GPU-free path).`
+  : `No lift on this corpus &mdash; the retriever already sets the ceiling; reranker stays off by default.`;
+document.getElementById("weakq").textContent = D.weak_context.query;
+document.getElementById("weak").textContent = D.weak_context.answer;
+document.getElementById("foot").innerHTML =
+  `Captured ${D.captured_at} over a ${D.corpus_size}-fact confusable corpus. `+
+  `Run it yourself: <code>python demo/capture_demo.py</code> (reproduces this run) and `+
+  `<code>cogniflow.serving.audit.run(backend)</code> (the live replay dashboard).`;
+</script>
+</body></html>

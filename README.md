@@ -102,6 +102,19 @@ This is **ChronoRAG** (temporal) × **PALIMPSEST** (self-falsifying) as a librar
 > is a **model-agnostic, fail-loud plug** (`cogniflow.generators`, NVIDIA/OpenAI/local), and
 > both surfaces run over MCP + HTTP, self-hostable. See [docs/GENERATION.md](docs/GENERATION.md).
 
+> **Launch layer - Slice C (the in-browser head-to-head demo + the measured reranker).** A
+> self-contained static page ([demo/static_demo/index.html](demo/static_demo/index.html), a
+> **real captured run**, zero setup) that makes the differentiator undeniable: it **leads with
+> the as-of axis** (plain RAG cannot answer "Where is Tesla HQ *as of 2015*?" at all; Cogniflow
+> answers Palo Alto), shows the **cited answer with `valid_at_source` confidence**, and reports
+> the **reranker measured on a deliberately confusable corpus**. The reranker is a
+> config-selected, fail-loud retrieval-stage plug (default self-hostable `bge-reranker-v2-m3`;
+> `nvidia-rerank` measured here), **off by default** and justified on evidence: on entity-named
+> queries BGE-M3 already tops out (retriever sets the ceiling), but on hard *indirect* queries
+> the reranker lifted top-1 7/8->8/8 (MRR +0.10), so it earns its place as an opt-in quality
+> tier. Reproduce it: `python demo/capture_demo.py`. See [docs/DEMO.md](docs/DEMO.md). (The
+> fifteen-second-stranger and in-browser visual checks are human steps before launch.)
+
 ## Design rule
 
 The **core is dependency-free**. `cogniflow.core` imports nothing but the standard

@@ -21,7 +21,24 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import time
+import urllib.error
 import urllib.request
+
+_RETRY_STATUS = {429, 500, 502, 503, 504}
+
+
+def _urlopen_json(req: urllib.request.Request, timeout: float, attempts: int = 6) -> dict:
+    """POST with bounded backoff on transient statuses (429/5xx) - hosted APIs rate-limit."""
+    for attempt in range(attempts):
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                return json.loads(resp.read())
+        except urllib.error.HTTPError as e:
+            if e.code in _RETRY_STATUS and attempt < attempts - 1:
+                time.sleep(2**attempt)  # 1s, 2s, 4s
+                continue
+            raise
 
 _DEFAULT_BASE = "https://integrate.api.nvidia.com/v1"
 _DEFAULT_MODEL = "minimaxai/minimax-m3"
@@ -78,8 +95,7 @@ class OpenAICompatibleGenerator:
                 "Content-Type": "application/json",
             },
         )
-        with urllib.request.urlopen(req, timeout=self.timeout) as resp:
-            payload = json.loads(resp.read())
+        payload = _urlopen_json(req, self.timeout)
         choices = payload.get("choices") or []
         if not choices:
             raise GeneratorError(f"generation LLM returned no choices: {payload!r}")
