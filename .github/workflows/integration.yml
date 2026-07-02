@@ -1,15 +1,16 @@
 name: integration
 
-# CI integration lane (CI-INT): spins up real backends and runs the integration
-# suite, so heartbeat / loop / replay / multi-backend parity are CI-gated, not only
-# run locally. This is also what makes a contributor's PR checkable against
-# integration. LLM-dependent tests run only when the COGNIFLOW_LLM_* secrets are set;
-# otherwise they skip cleanly (the job still passes).
+# CI integration lane (CI-INT): spins up real backends (FalkorDB + Neo4j) and runs the full
+# integration suite - heartbeat / loop / replay / multi-backend parity. Two service containers
+# make this the most expensive job, so it runs WEEKLY and on demand (workflow_dispatch), NOT on
+# every push, to keep private-repo Actions minutes in budget. The core un-knowing invariant is
+# still gated per-PR by the cheaper `replay-invariant` job in ci.yml (FalkorDB only, no key).
+# LLM-dependent tests run only when the COGNIFLOW_LLM_* secrets are set; otherwise they skip.
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
+  schedule:
+    - cron: "0 6 * * 1"   # weekly (Mon 06:00 UTC)
 
 permissions:
   contents: read

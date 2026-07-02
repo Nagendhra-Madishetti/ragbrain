@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
   pull_request:
+  schedule:
+    - cron: "0 6 * * 1"   # weekly (Mon 06:00 UTC): periodic invariant check on main
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -30,10 +33,13 @@ jobs:
       - name: Test (contracts + conformance stub)
         run: pytest
 
-  # The headline un-knowing invariant, enforced on every PR against a real FalkorDB with NO
-  # external model key: replay to before a correction must not leak the later invalidation
-  # backward. Seeded structured data (no extraction LLM), so it is deterministic and secret-free.
+  # The headline un-knowing invariant against a real FalkorDB with NO external model key: replay
+  # to before a correction must not leak the later invalidation backward. Seeded structured data
+  # (no extraction LLM), so it is deterministic and secret-free. Runs on PRs, weekly, and on
+  # demand - NOT on direct pushes to main - to keep private-repo Actions minutes in budget (the
+  # service container is the cost). The cheap `test` job still runs on every push.
   replay-invariant:
+    if: github.event_name != 'push'
     runs-on: ubuntu-latest
     services:
       falkordb:
