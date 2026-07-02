@@ -1,7 +1,9 @@
 # Cogniflow - one-command local/trusted-environment standup
 #   docker compose up --build      # FalkorDB + API + web, secure-by-default (auth ON)
 #   bash scripts/demo.sh           # the 60-second Acme bitemporal proof (key-free)
-# NOT production HA: in-memory session/queue break multi-replica; k8s and HA packaging are on the roadmap.
+# Local/trusted-environment standup. For multi-replica production deployment, add the overlay:
+#   docker compose -f docker-compose.yml -f docker-compose.replicas.yml up -d --build
+# (shared session state + durable shared journal; verified by scripts/two_replica_proof.sh)
 name: cogniflow
 
 services:
