@@ -1,5 +1,7 @@
 # Cogniflow
 
+[![ci](https://github.com/Nagendhra-web/cogniflow/actions/workflows/ci.yml/badge.svg)](https://github.com/Nagendhra-web/cogniflow/actions/workflows/ci.yml)
+
 **A bi-temporal RAG platform: any document in → a cited, temporally-correct answer out — plus
 the one thing a plain RAG cannot do: replay what the system *believed* at a past moment.**
 
