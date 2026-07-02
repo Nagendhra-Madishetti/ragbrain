@@ -30,8 +30,9 @@ export default function BenchmarkPage() {
         <p className="text-subhead mb-8 max-w-[68ch]">
           Every system runs on the same fictional corpus with the same model &mdash; only the
           memory layer differs. On current facts they tie; that&rsquo;s table stakes. The
-          difference is <b>as-of</b> questions: what was true at a past date. Only Cogniflow
-          answers them correctly.
+          difference is <b>as-of</b> questions: what was true at a past date. On this benchmark,
+          on these questions, only Cogniflow answers them correctly &mdash; the claim is exactly
+          the size of the measurement.
         </p>
       </Reveal>
 

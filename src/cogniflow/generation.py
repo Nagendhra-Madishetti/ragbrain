@@ -140,7 +140,10 @@ async def generate_answer(
     )
     answer = (await _maybe_await(generator(build_prompt(query, context)))).strip()
     checker = create_checker(faithfulness, generator=generator)
-    report = await checker.check(answer, list(context.facts))
+    # the as-of year is caller-supplied truth (it appears in honest answers like "As of 2015,
+    # ..."), so the checker must not count it as model-invented content
+    known = {str(context.as_of.year)} if context.as_of else None
+    report = await checker.check(answer, list(context.facts), known=known)
     if faithfulness_mode == "strict" and report.unsupported_claims:
         answer = _DECLINE.format(n=len(report.unsupported_claims), checker=report.checker)
     return GenerationResult(

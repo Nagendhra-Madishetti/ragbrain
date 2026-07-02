@@ -73,18 +73,49 @@ def _hq(eid: str, company: str, city: str, year: int) -> Episode:
     )
 
 
-# A FICTIONAL corpus: no LLM has memorized these, so as-of questions can only be answered by a
-# temporal store. Changed-HQ entities are written oldest-first so the newer supersedes.
-EPISODES = [
-    _hq("meridian_old", "Meridian Systems", "Calderport", 2009),
-    _hq("orinoco_old", "Orinoco Labs", "Westfall", 2011),
-    _hq("zephyr", "Zephyr Logistics", "Millbrook", 2010),
-    _hq("corvus", "Corvus Analytics", "Fenwick", 2012),
-    _hq("halcyon", "Halcyon Grid", "Ashford", 2013),
-    _hq("vantor", "Vantor Foods", "Draymoor", 2014),
-    _hq("meridian_new", "Meridian Systems", "Newhaven", 2020),  # supersedes Calderport
-    _hq("orinoco_new", "Orinoco Labs", "Kingsford", 2019),      # supersedes Westfall
+# A FICTIONAL corpus: no LLM has memorized these COMPANIES, so as-of questions can only be
+# answered by a temporal store. Changed-HQ entities are written oldest-first so the newer
+# supersedes. F3 expansion: 20 stable companies (does the tie hold at 20?), 6 movers including
+# a TWO-HOP supersession chain (Gantry: Redmarsh -> Stonewick -> Wrenfield).
+_STABLE = [
+    ("zephyr", "Zephyr Logistics", "Millbrook", 2010),
+    ("corvus", "Corvus Analytics", "Fenwick", 2012),
+    ("halcyon", "Halcyon Grid", "Ashford", 2013),
+    ("vantor", "Vantor Foods", "Draymoor", 2014),
+    ("ashgrove", "Ashgrove Metals", "Sablewood", 2010),
+    ("bluewick", "Bluewick Energy", "Torvane", 2012),
+    ("calderdyn", "Calder Dynamics", "Grelling", 2011),
+    ("drayton", "Drayton Marine", "Ostmere", 2013),
+    ("ellsworth", "Ellsworth Biotech", "Pellworth", 2014),
+    ("foxbridge", "Foxbridge Capital", "Quillhaven", 2015),
+    ("junewood", "Junewood Press", "Redfall", 2009),
+    ("lorimer", "Lorimer Shipping", "Saltmere", 2011),
+    ("marrowgate", "Marrowgate Pharma", "Thornmere", 2012),
+    ("northquay", "Northquay Insurance", "Umberley", 2013),
+    ("oakhollow", "Oakhollow Farms", "Veldmoor", 2010),
+    ("pinemont", "Pinemont Software", "Wrenlow", 2016),
+    ("quarrell", "Quarrell Robotics", "Yarrowgate", 2014),
+    ("rushdale", "Rushdale Media", "Zellwick", 2015),
+    ("silvermoor", "Silvermoor Textiles", "Brackenholt", 2012),
+    ("tarnwick", "Tarnwick Optics", "Caldbrook", 2013),
 ]
+_MOVES = [
+    ("meridian_old", "Meridian Systems", "Calderport", 2009),
+    ("orinoco_old", "Orinoco Labs", "Westfall", 2011),
+    ("gantry_old", "Gantry Textiles", "Redmarsh", 2008),
+    ("harwick_old", "Harwick Instruments", "Elmsworth", 2010),
+    ("ironvale_old", "Ironvale Mining", "Fernbeck", 2012),
+    ("kestrel_old", "Kestrel Avionics", "Glenmoor", 2011),
+    ("gantry_mid", "Gantry Textiles", "Stonewick", 2015),   # hop 1 of the chain
+    ("kestrel_new", "Kestrel Avionics", "Hollowbrent", 2018),
+    ("orinoco_new", "Orinoco Labs", "Kingsford", 2019),
+    ("meridian_new", "Meridian Systems", "Newhaven", 2020),
+    ("ironvale_new", "Ironvale Mining", "Ivorlan", 2020),
+    ("gantry_new", "Gantry Textiles", "Wrenfield", 2021),   # hop 2 of the chain
+    ("harwick_new", "Harwick Instruments", "Dunmarsh", 2022),
+]
+# olds before news so supersession runs in write order
+EPISODES = [_hq(*row) for row in (*_STABLE[:6], *_MOVES[:6], *_STABLE[6:], *_MOVES[6:])]
 
 
 async def build(backend) -> None:
@@ -92,21 +123,30 @@ async def build(backend) -> None:
         await backend.write(ep)
 
 
-# Panel 1: stable fictional facts that do not change - a fair test both systems can pass.
+# Panel 1: 20 stable fictional facts that do not change - a fair test both systems can pass.
+# The honest tie at n=20 is what makes the as-of panel credible.
 STANDARD = [
-    {"q": "Where is Zephyr Logistics headquartered?", "expect": "Millbrook"},
-    {"q": "Where is Corvus Analytics headquartered?", "expect": "Fenwick"},
-    {"q": "Where is Halcyon Grid headquartered?", "expect": "Ashford"},
-    {"q": "Where is Vantor Foods headquartered?", "expect": "Draymoor"},
+    {"q": f"Where is {company} headquartered?", "expect": city}
+    for _, company, city, _y in _STABLE
 ]
 
 # Panel 2: what was true at a PAST date, for entities that later moved - only a temporal store
-# can answer (dates are not in the text; the entities are fictional).
+# can answer (dates are not in the text; the companies are fictional). Includes the two-hop
+# chain (both hops) and post-move boundaries (as-of AFTER a move must return the NEW city,
+# not the older one).
 AS_OF = [
     {"q": "Where was Meridian Systems headquartered in 2015?", "expect": "Calderport", "avoid": "Newhaven", "as_of": _dt(2015)},
     {"q": "Where was Orinoco Labs headquartered in 2013?", "expect": "Westfall", "avoid": "Kingsford", "as_of": _dt(2013)},
     {"q": "Where was Meridian Systems headquartered in 2011?", "expect": "Calderport", "avoid": "Newhaven", "as_of": _dt(2011)},
     {"q": "Where was Orinoco Labs headquartered in 2015?", "expect": "Westfall", "avoid": "Kingsford", "as_of": _dt(2015)},
+    {"q": "Where was Gantry Textiles headquartered in 2012?", "expect": "Redmarsh", "avoid": "Stonewick", "as_of": _dt(2012)},
+    {"q": "Where was Gantry Textiles headquartered in 2018?", "expect": "Stonewick", "avoid": "Wrenfield", "as_of": _dt(2018)},
+    {"q": "Where was Gantry Textiles headquartered in 2010?", "expect": "Redmarsh", "avoid": "Wrenfield", "as_of": _dt(2010)},
+    {"q": "Where was Harwick Instruments headquartered in 2016?", "expect": "Elmsworth", "avoid": "Dunmarsh", "as_of": _dt(2016)},
+    {"q": "Where was Ironvale Mining headquartered in 2016?", "expect": "Fernbeck", "avoid": "Ivorlan", "as_of": _dt(2016)},
+    {"q": "Where was Kestrel Avionics headquartered in 2014?", "expect": "Glenmoor", "avoid": "Hollowbrent", "as_of": _dt(2014)},
+    {"q": "Where was Kestrel Avionics headquartered in 2019?", "expect": "Hollowbrent", "avoid": "Glenmoor", "as_of": _dt(2019)},
+    {"q": "Where was Meridian Systems headquartered in 2021?", "expect": "Newhaven", "avoid": "Calderport", "as_of": _dt(2021)},
 ]
 
 

@@ -32,10 +32,12 @@ from .context import ServedFact
 GeneratorFn = Callable[[str], "str | Awaitable[str]"]
 
 _DEFAULT_CHECKER = "lexical"
-# Strict by design: at 0.75 an entity substitution ("...in Austin" against a Palo-Alto fact,
-# coverage 2/3) is flagged; a faithful restatement with an as-of date (4/5) passes. Errs toward
-# flagging - never toward silently passing. Tune per deployment; measured in PROJECT_STATUS.
-_DEFAULT_THRESHOLD = 0.75
+# Two-rule support (measured on the labeled corpus, PROJECT_STATUS): a claim is supported only
+# if (1) every SALIENT token (numbers + proper nouns - the shape of every entity/quantity
+# substitution and invention) appears in the best fact, AND (2) general content-token coverage
+# meets the threshold (catches invented lowercase content; 0.6 tolerates paraphrase). Errs
+# toward flagging - never toward silently passing.
+_DEFAULT_THRESHOLD = 0.6
 
 # Words that carry no claim content (articles, copulas, query scaffolding, citation words).
 _STOP = frozenset(
@@ -110,6 +112,18 @@ def _tokens(text: str) -> set[str]:
     }
 
 
+def _salient(text: str) -> set[str]:
+    """Numbers + proper-noun-shaped words (capitalized/ALLCAPS anywhere in the sentence),
+    lowercased, stopwords removed. Substitutions and inventions almost always introduce a
+    NOVEL salient token - the high-precision signal the coverage ratio alone can miss."""
+    out: set[str] = set()
+    for m in re.finditer(r"\b(?:\d+(?:[.,]\d+)?|[A-Z][A-Za-z0-9\-]*)\b", text):
+        w = m.group(0).lower().strip("-")
+        if w and w not in _STOP and len(w) > 1:
+            out.add(w)
+    return out
+
+
 def decompose(answer: str) -> list[str]:
     """Split an answer into checkable claims. Deterministic sentence-level decomposition:
     strip citation tails and source-only lines, split on sentence boundaries, drop fragments
@@ -142,7 +156,11 @@ class LexicalChecker:
             raise FaithfulnessError(f"lexical threshold must be in (0, 1], got {threshold}")
         self.threshold = threshold
 
-    async def check(self, answer: str, facts: list[ServedFact]) -> FaithfulnessReport:
+    async def check(
+        self, answer: str, facts: list[ServedFact], known: set[str] | None = None
+    ) -> FaithfulnessReport:
+        """``known`` = caller-provided tokens that are legitimate even if absent from fact text
+        (e.g. the as-of year the caller itself supplied) - never model-invented content."""
         claims = decompose(answer)
         if not claims:
             return FaithfulnessReport(
@@ -150,9 +168,10 @@ class LexicalChecker:
                 status="no_checkable_claims",
                 note="refusal or no factual sentences" if _REFUSAL_RE.search(answer) else None,
             )
+        known = {k.lower() for k in (known or set())}
         fact_tokens: list[tuple[str, set[str]]] = []
         for f in facts:
-            toks = _tokens(f.statement)
+            toks = _tokens(f.statement) | _salient(f.statement)
             if f.valid_at is not None:
                 toks |= {str(f.valid_at.year)}
             fact_tokens.append((f.belief_id, toks))
@@ -163,15 +182,21 @@ class LexicalChecker:
                 verdicts.append(ClaimVerdict(claim=claim, status="uncheckable"))
                 continue
             ct = _tokens(claim)
-            best_id, best_cov = None, 0.0
+            cs = _salient(claim)
+            best_id, best_cov, supported = None, 0.0, False
             for belief_id, ft in fact_tokens:
-                cov = len(ct & ft) / len(ct)
-                if cov > best_cov:
-                    best_id, best_cov = belief_id, cov
-            status = "supported" if best_cov >= self.threshold else "unsupported"
+                cov = len(ct & ft) / len(ct) if ct else 0.0
+                # rule 1: no novel salient token (entity/number substitutions + inventions);
+                # rule 2: enough general content coverage (invented lowercase content).
+                ok = not (cs - ft - known) and cov >= self.threshold
+                if (ok and not supported) or (ok == supported and cov > best_cov):
+                    best_id, best_cov, supported = belief_id, cov, ok
             verdicts.append(
                 ClaimVerdict(
-                    claim=claim, status=status, best_fact=best_id, score=round(best_cov, 3)
+                    claim=claim,
+                    status="supported" if supported else "unsupported",
+                    best_fact=best_id,
+                    score=round(best_cov, 3),
                 )
             )
         return _finalize(self.name, verdicts)
@@ -207,7 +232,9 @@ or
             )
         self.generator = generator
 
-    async def check(self, answer: str, facts: list[ServedFact]) -> FaithfulnessReport:
+    async def check(
+        self, answer: str, facts: list[ServedFact], known: set[str] | None = None
+    ) -> FaithfulnessReport:
         claims = decompose(answer)
         if not claims:
             return FaithfulnessReport(checker=self.name, status="no_checkable_claims")
@@ -243,7 +270,9 @@ class OffChecker:
 
     name = "off"
 
-    async def check(self, answer: str, facts: list[ServedFact]) -> FaithfulnessReport:
+    async def check(
+        self, answer: str, facts: list[ServedFact], known: set[str] | None = None
+    ) -> FaithfulnessReport:
         return FaithfulnessReport(
             checker=self.name, status="unchecked", note="faithfulness checking is disabled"
         )
