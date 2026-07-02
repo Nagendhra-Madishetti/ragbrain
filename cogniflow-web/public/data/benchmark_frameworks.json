@@ -1,67 +1,211 @@
 {
-  "captured_at": "2026-07-01T20:31:18.226617+00:00",
+  "captured_at": "2026-07-02T20:23:10.506054+00:00",
   "reproduce": "python demo/benchmark_frameworks.py",
-  "content_hash": "sha256:0254753a2a28dde91df249b9de3fc5855cfb72d1742674d9d72b90c9d6ae409b",
+  "content_hash": "sha256:81966ec5d774edc1048e9091b2b99d5ef31bf12dca5480671364e33f8369c3fe",
   "systems": [
     {
       "name": "Cogniflow",
       "kind": "bi-temporal \u00b7 as-of",
       "standard": {
-        "n": 4,
-        "score": 4,
+        "n": 20,
+        "score": 20,
         "rows": [
           {
             "q": "Where is Zephyr Logistics headquartered?",
             "expect": "Millbrook",
-            "answer": "Zephyr Logistics is headquartered in Millbrook.\n\nSource: CONTEXT FACTS \u2014 \"Zephyr Logistics is headquartered in Millbrook [valid_from: 2010-01-01; confidence: derived; source: zephyr]\"",
+            "answer": "Zephyr Logistics is headquartered in Millbrook.\n\nSource: [zephyr] \u2014 \"Zephyr Logistics is headquartered in Millbrook [valid_from: 2010-01-01]\"",
             "hit": true
           },
           {
             "q": "Where is Corvus Analytics headquartered?",
             "expect": "Fenwick",
-            "answer": "Corvus Analytics is headquartered in Fenwick.\n\nSource: Corvus Analytics is headquartered in Fenwick [valid_from: 2012-01-01; confidence: derived; source: corvus]",
+            "answer": "Corvus Analytics is headquartered in Fenwick.\n\nSource: \"Corvus Analytics is headquartered in Fenwick [valid_from: 2012-01-01; confidence: derived; source: corvus]\"",
             "hit": true
           },
           {
             "q": "Where is Halcyon Grid headquartered?",
             "expect": "Ashford",
-            "answer": "Halcyon Grid is headquartered in Ashford.\n\nSource: \"Halcyon Grid is headquartered in Ashford [valid_from: 2013-01-01; confidence: derived; source: halcyon]\"",
+            "answer": "Halcyon Grid is headquartered in Ashford.\n\nSource: Context fact \"Halcyon Grid is headquartered in Ashford [valid_from: 2013-01-01; confidence: derived; source: halcyon]\"",
             "hit": true
           },
           {
             "q": "Where is Vantor Foods headquartered?",
             "expect": "Draymoor",
-            "answer": "Vantor Foods is headquartered in Draymoor.\n\nSource: Vantor Foods is headquartered in Draymoor [valid_from: 2014-01-01; confidence: derived; source: vantor]",
+            "answer": "Vantor Foods is headquartered in Draymoor.\n\nSource: Vantor Foods headquarters fact [valid_from: 2014-01-01; confidence: derived; source: vantor]",
+            "hit": true
+          },
+          {
+            "q": "Where is Ashgrove Metals headquartered?",
+            "expect": "Sablewood",
+            "answer": "Ashgrove Metals is headquartered in Sablewood.\n\nSource: [valid_from: 2010-01-01; confidence: derived; source: ashgrove]",
+            "hit": true
+          },
+          {
+            "q": "Where is Bluewick Energy headquartered?",
+            "expect": "Torvane",
+            "answer": "Bluewick Energy is headquartered in Torvane.\n\n(Cited fact: \"Bluewick Energy is headquartered in Torvane [valid_from: 2012-01-01; confidence: derived; source: bluewick]\")",
+            "hit": true
+          },
+          {
+            "q": "Where is Calder Dynamics headquartered?",
+            "expect": "Grelling",
+            "answer": "Calder Dynamics is headquartered in Grelling.\n\nSource: CONTEXT FACTS - \"Calder Dynamics is headquartered in Grelling [valid_from: 2011-01-01; confidence: derived; source: calderdyn]\"",
+            "hit": true
+          },
+          {
+            "q": "Where is Drayton Marine headquartered?",
+            "expect": "Ostmere",
+            "answer": "Drayton Marine is headquartered in Ostmere.\n\nSource: Drayton Marine is headquartered in Ostmere [valid_from: 2013-01-01; confidence: derived; source: drayton]",
+            "hit": true
+          },
+          {
+            "q": "Where is Ellsworth Biotech headquartered?",
+            "expect": "Pellworth",
+            "answer": "Ellsworth Biotech is headquartered in Pellworth.\n\nSource: \"Ellsworth Biotech is headquartered in Pellworth [valid_from: 2014-01-01; confidence: derived; source: ellsworth]\"",
+            "hit": true
+          },
+          {
+            "q": "Where is Foxbridge Capital headquartered?",
+            "expect": "Quillhaven",
+            "answer": "Foxbridge Capital is headquartered in Quillhaven.\n\nSource: [foxbridge, valid_from: 2015-01-01]",
+            "hit": true
+          },
+          {
+            "q": "Where is Junewood Press headquartered?",
+            "expect": "Redfall",
+            "answer": "Junewood Press is headquartered in Redfall.\n\nSource: Context fact \"Junewood Press is headquartered in Redfall [valid_from: 2009-01-01; confidence: derived; source: junewood]\"",
+            "hit": true
+          },
+          {
+            "q": "Where is Lorimer Shipping headquartered?",
+            "expect": "Saltmere",
+            "answer": "Lorimer Shipping is headquartered in Saltmere.\n\nSource: [lorimer, valid_from: 2011-01-01]",
+            "hit": true
+          },
+          {
+            "q": "Where is Marrowgate Pharma headquartered?",
+            "expect": "Thornmere",
+            "answer": "Marrowgate Pharma is headquartered in Thornmere.\n\nSource: Marrowgate Pharma is headquartered in Thornmere [valid_from: 2012-01-01; confidence: derived; source: marrowgate]",
+            "hit": true
+          },
+          {
+            "q": "Where is Northquay Insurance headquartered?",
+            "expect": "Umberley",
+            "answer": "Northquay Insurance is headquartered in Umberley.\n\nSource: \"Northquay Insurance is headquartered in Umberley [valid_from: 2013-01-01; confidence: derived; source: northquay]\"",
+            "hit": true
+          },
+          {
+            "q": "Where is Oakhollow Farms headquartered?",
+            "expect": "Veldmoor",
+            "answer": "Oakhollow Farms is headquartered in Veldmoor.\n\nSource: [oakhollow]",
+            "hit": true
+          },
+          {
+            "q": "Where is Pinemont Software headquartered?",
+            "expect": "Wrenlow",
+            "answer": "Pinemont Software is headquartered in Wrenlow.\n\nSource: pinemont (valid_from: 2016-01-01)",
+            "hit": true
+          },
+          {
+            "q": "Where is Quarrell Robotics headquartered?",
+            "expect": "Yarrowgate",
+            "answer": "Quarrell Robotics is headquartered in Yarrowgate.\n\nSource: [quarrell]",
+            "hit": true
+          },
+          {
+            "q": "Where is Rushdale Media headquartered?",
+            "expect": "Zellwick",
+            "answer": "Rushdale Media is headquartered in Zellwick.\n\nSource: Rushdale Media is headquartered in Zellwick [valid_from: 2015-01-01; confidence: derived; source: rushdale]",
+            "hit": true
+          },
+          {
+            "q": "Where is Silvermoor Textiles headquartered?",
+            "expect": "Brackenholt",
+            "answer": "Silvermoor Textiles is headquartered in Brackenholt.\n\nSource: silvermoor (valid from 2012-01-01)",
+            "hit": true
+          },
+          {
+            "q": "Where is Tarnwick Optics headquartered?",
+            "expect": "Caldbrook",
+            "answer": "Tarnwick Optics is headquartered in Caldbrook.\n\nSource: [tarnwick, valid_from: 2013-01-01]",
             "hit": true
           }
         ]
       },
       "as_of": {
-        "n": 4,
-        "score": 4,
+        "n": 12,
+        "score": 12,
         "rows": [
           {
             "q": "Where was Meridian Systems headquartered in 2015?",
             "expect": "Calderport",
-            "answer": "According to the context facts, Meridian Systems is headquartered in Calderport [valid_from: 2009-01-01; confidence: derived; source: meridian_old].",
+            "answer": "Based on the context facts, Meridian Systems was headquartered in **Calderport**.\n\nThis is supported by the fact: \"Meridian Systems is headquartered in Calderport [valid_from: 2009-01-01; confidence: derived; source: meridian_old]\"\n\nSince the valid_from date is 2009-01-01 and the fact remains in the knowledge base as of 2015-01-01, this headquarters location applies to 2015.",
             "hit": true
           },
           {
             "q": "Where was Orinoco Labs headquartered in 2013?",
             "expect": "Westfall",
-            "answer": "According to the context facts, Orinoco Labs was headquartered in Westfall [valid_from: 2011-01-01; confidence: derived; source: orinoco_old].",
+            "answer": "According to the context facts, Orinoco Labs was headquartered in Westfall [valid_from: 2011-01-01; source: orinoco_old].",
             "hit": true
           },
           {
             "q": "Where was Meridian Systems headquartered in 2011?",
             "expect": "Calderport",
-            "answer": "According to the context facts, Meridian Systems was headquartered in Calderport [source: meridian_old].",
+            "answer": "According to the context facts, Meridian Systems was headquartered in **Calderport** [valid_from: 2009-01-01; source: meridian_old].\n\nNote: The context fact does not specify an end date for this headquarters location, so based on the available information, Calderport is the headquarters location as of 2011.",
             "hit": true
           },
           {
             "q": "Where was Orinoco Labs headquartered in 2015?",
             "expect": "Westfall",
             "answer": "According to the context facts, Orinoco Labs was headquartered in **Westfall** (valid from 2011-01-01, source: orinoco_old).",
+            "hit": true
+          },
+          {
+            "q": "Where was Gantry Textiles headquartered in 2012?",
+            "expect": "Redmarsh",
+            "answer": "According to the context facts, Gantry Textiles was headquartered in **Redmarsh** (valid from 2008-01-01, source: gantry_old).",
+            "hit": true
+          },
+          {
+            "q": "Where was Gantry Textiles headquartered in 2018?",
+            "expect": "Stonewick",
+            "answer": "According to the context facts, Gantry Textiles was headquartered in **Stonewick** (valid from 2015-01-01, source: gantry_mid).",
+            "hit": true
+          },
+          {
+            "q": "Where was Gantry Textiles headquartered in 2010?",
+            "expect": "Redmarsh",
+            "answer": "According to the context facts, Gantry Textiles was headquartered in **Redmarsh** (valid from 2008-01-01, source: gantry_old).",
+            "hit": true
+          },
+          {
+            "q": "Where was Harwick Instruments headquartered in 2016?",
+            "expect": "Elmsworth",
+            "answer": "According to the context facts, Harwick Instruments was headquartered in **Elmsworth** (valid from 2010-01-01, source: harwick_old).",
+            "hit": true
+          },
+          {
+            "q": "Where was Ironvale Mining headquartered in 2016?",
+            "expect": "Fernbeck",
+            "answer": "According to the context facts, Ironvale Mining was headquartered in **Fernbeck** (valid from 2012-01-01, source: ironvale_old).",
+            "hit": true
+          },
+          {
+            "q": "Where was Kestrel Avionics headquartered in 2014?",
+            "expect": "Glenmoor",
+            "answer": "According to the context facts, Kestrel Avionics was headquartered in Glenmoor (valid from 2011-01-01, source: kestrel_old).",
+            "hit": true
+          },
+          {
+            "q": "Where was Kestrel Avionics headquartered in 2019?",
+            "expect": "Hollowbrent",
+            "answer": "According to the context facts, Kestrel Avionics is headquartered in Hollowbrent [valid_from: 2018-01-01; source: kestrel_new].",
+            "hit": true
+          },
+          {
+            "q": "Where was Meridian Systems headquartered in 2021?",
+            "expect": "Newhaven",
+            "answer": "According to the context facts, Meridian Systems was headquartered in **Newhaven** (valid from 2020-01-01, source: meridian_new).",
             "hit": true
           }
         ]
@@ -71,8 +215,8 @@
       "name": "Graphiti (substrate, no as-of)",
       "kind": "temporal \u00b7 ablation",
       "standard": {
-        "n": 4,
-        "score": 4,
+        "n": 20,
+        "score": 20,
         "rows": [
           {
             "q": "Where is Zephyr Logistics headquartered?",
@@ -95,38 +239,182 @@
           {
             "q": "Where is Vantor Foods headquartered?",
             "expect": "Draymoor",
-            "answer": "Vantor Foods is headquartered in Draymoor.\n\nSource: Vantor Foods is headquartered in Draymoor [valid_from: 2014-01-01; confidence: derived; source: vantor]",
+            "answer": "Vantor Foods is headquartered in Draymoor.\n\nSource: [vantor]",
+            "hit": true
+          },
+          {
+            "q": "Where is Ashgrove Metals headquartered?",
+            "expect": "Sablewood",
+            "answer": "Ashgrove Metals is headquartered in Sablewood.\n\nSource: [valid_from: 2010-01-01; confidence: derived; source: ashgrove]",
+            "hit": true
+          },
+          {
+            "q": "Where is Bluewick Energy headquartered?",
+            "expect": "Torvane",
+            "answer": "Bluewick Energy is headquartered in Torvane.\n\n(Cited fact: \"Bluewick Energy is headquartered in Torvane [valid_from: 2012-01-01; confidence: derived; source: bluewick]\")",
+            "hit": true
+          },
+          {
+            "q": "Where is Calder Dynamics headquartered?",
+            "expect": "Grelling",
+            "answer": "Calder Dynamics is headquartered in Grelling.\n\nSource: \"Calder Dynamics is headquartered in Grelling [valid_from: 2011-01-01; confidence: derived; source: calderdyn]\"",
+            "hit": true
+          },
+          {
+            "q": "Where is Drayton Marine headquartered?",
+            "expect": "Ostmere",
+            "answer": "Drayton Marine is headquartered in Ostmere.\n\nSource: [drayton]",
+            "hit": true
+          },
+          {
+            "q": "Where is Ellsworth Biotech headquartered?",
+            "expect": "Pellworth",
+            "answer": "Ellsworth Biotech is headquartered in Pellworth.\n\nSource: [ellsworth]",
+            "hit": true
+          },
+          {
+            "q": "Where is Foxbridge Capital headquartered?",
+            "expect": "Quillhaven",
+            "answer": "Foxbridge Capital is headquartered in Quillhaven.\n\nSource: Foxbridge Capital is headquartered in Quillhaven [valid_from: 2015-01-01; confidence: derived; source: foxbridge]",
+            "hit": true
+          },
+          {
+            "q": "Where is Junewood Press headquartered?",
+            "expect": "Redfall",
+            "answer": "Junewood Press is headquartered in Redfall.\n\nSource: \"Junewood Press is headquartered in Redfall [valid_from: 2009-01-01; confidence: derived; source: junewood]\"",
+            "hit": true
+          },
+          {
+            "q": "Where is Lorimer Shipping headquartered?",
+            "expect": "Saltmere",
+            "answer": "Lorimer Shipping is headquartered in **Saltmere**.\n\nThis is based on the context fact: \"Lorimer Shipping is headquartered in Saltmere [valid_from: 2011-01-01; confidence: derived; source: lorimer].\"",
+            "hit": true
+          },
+          {
+            "q": "Where is Marrowgate Pharma headquartered?",
+            "expect": "Thornmere",
+            "answer": "Marrowgate Pharma is headquartered in Thornmere.\n\nSource: [marrowgate fact, valid_from: 2012-01-01]",
+            "hit": true
+          },
+          {
+            "q": "Where is Northquay Insurance headquartered?",
+            "expect": "Umberley",
+            "answer": "Northquay Insurance is headquartered in Umberley.\n\nSource: \"Northquay Insurance is headquartered in Umberley [valid_from: 2013-01-01; confidence: derived; source: northquay]\"",
+            "hit": true
+          },
+          {
+            "q": "Where is Oakhollow Farms headquartered?",
+            "expect": "Veldmoor",
+            "answer": "Oakhollow Farms is headquartered in Veldmoor.\n\nSource: [oakhollow]",
+            "hit": true
+          },
+          {
+            "q": "Where is Pinemont Software headquartered?",
+            "expect": "Wrenlow",
+            "answer": "Pinemont Software is headquartered in Wrenlow.\n\nSource: [pinemont]",
+            "hit": true
+          },
+          {
+            "q": "Where is Quarrell Robotics headquartered?",
+            "expect": "Yarrowgate",
+            "answer": "Quarrell Robotics is headquartered in Yarrowgate.\n\nSource: [quarrell]",
+            "hit": true
+          },
+          {
+            "q": "Where is Rushdale Media headquartered?",
+            "expect": "Zellwick",
+            "answer": "Rushdale Media is headquartered in Zellwick.\n\nSource: Rushdale Media is headquartered in Zellwick [valid_from: 2015-01-01; confidence: derived; source: rushdale]",
+            "hit": true
+          },
+          {
+            "q": "Where is Silvermoor Textiles headquartered?",
+            "expect": "Brackenholt",
+            "answer": "Silvermoor Textiles is headquartered in Brackenholt.\n\nSource: Silvermoor Textiles is headquartered in Brackenholt [valid_from: 2012-01-01; confidence: derived; source: silvermoor]",
+            "hit": true
+          },
+          {
+            "q": "Where is Tarnwick Optics headquartered?",
+            "expect": "Caldbrook",
+            "answer": "Tarnwick Optics is headquartered in Caldbrook.\n\n(Cited fact: \"Tarnwick Optics is headquartered in Caldbrook [valid_from: 2013-01-01; confidence: derived; source: tarnwick]\")",
             "hit": true
           }
         ]
       },
       "as_of": {
-        "n": 4,
-        "score": 0,
+        "n": 12,
+        "score": 2,
         "rows": [
           {
             "q": "Where was Meridian Systems headquartered in 2015?",
             "expect": "Calderport",
-            "answer": "According to the context facts, Meridian Systems is headquartered in Newhaven [valid_from: 2020-01-01; confidence: derived; source: meridian_new].\n\nHowever, I should note that this fact has a valid_from date of 2020-01-01, which means it only confirms the headquarters location as of 2020 onward. The context does not contain specific information about where Meridian Systems was headquartered in 2015.",
+            "answer": "I do not have that information. The context facts indicate that Meridian Systems is headquartered in Newhaven, with a validity starting from 2020-01-01, but they do not provide information about where Meridian Systems was headquartered in 2015.",
             "hit": false
           },
           {
             "q": "Where was Orinoco Labs headquartered in 2013?",
             "expect": "Westfall",
-            "answer": "According to the context facts, Orinoco Labs is headquartered in Kingsford [valid_from: 2019-01-01].\n\nHowever, the context fact specifies that this headquarters location is valid from 2019-01-01 onward. The context does not contain information about where Orinoco Labs was headquartered in 2013, so I cannot answer that question with the provided facts.",
+            "answer": "I do not have that information. The context facts indicate that Orinoco Labs has been headquartered in Kingsford since 2019-01-01, but they do not provide any information about where Orinoco Labs was headquartered in 2013.",
             "hit": false
           },
           {
             "q": "Where was Meridian Systems headquartered in 2011?",
             "expect": "Calderport",
-            "answer": "I do not have that information. The context facts indicate that Meridian Systems has been headquartered in Newhaven since 2020-01-01, but they do not provide any information about where Meridian Systems was headquartered in 2011.",
+            "answer": "I do not have that information. The context facts indicate that Meridian Systems has been headquartered in Newhaven since 2020-01-01, but no information is provided about its headquarters location in 2011.",
             "hit": false
           },
           {
             "q": "Where was Orinoco Labs headquartered in 2015?",
             "expect": "Westfall",
-            "answer": "According to the context facts, Orinoco Labs is headquartered in Kingsford [valid_from: 2019-01-01].\n\nHowever, I should note that this fact has a valid_from date of 2019-01-01, which means it only confirms the headquarters location starting from 2019. The context does not contain information about where Orinoco Labs was headquartered in 2015 specifically. I do not have that information.",
+            "answer": "According to the context facts, Orinoco Labs is headquartered in Kingsford [valid_from: 2019-01-01]. However, this fact is only valid from 2019-01-01 onward, so it does not provide information about where Orinoco Labs was headquartered in 2015. I do not have that information in the provided context.",
             "hit": false
+          },
+          {
+            "q": "Where was Gantry Textiles headquartered in 2012?",
+            "expect": "Redmarsh",
+            "answer": "I do not have that information. The context facts indicate that Gantry Textiles was headquartered in Stonewick starting from 2015-01-01 and in Wrenfield starting from 2021-01-01, but no information is provided about its headquarters location in 2012.",
+            "hit": false
+          },
+          {
+            "q": "Where was Gantry Textiles headquartered in 2018?",
+            "expect": "Stonewick",
+            "answer": "According to the context facts, Gantry Textiles was headquartered in **Stonewick** in 2018.\n\nThis is based on the fact: \"Gantry Textiles is headquartered in Stonewick [valid_from: 2015-01-01; confidence: derived; source: gantry_mid]\"\n\nSince this fact is valid from 2015-01-01 and the other fact stating Gantry Textiles is headquartered in Wrenfield only becomes valid from 2021-01-01, Stonewick was the headquarters location in 2018.",
+            "hit": false
+          },
+          {
+            "q": "Where was Gantry Textiles headquartered in 2010?",
+            "expect": "Redmarsh",
+            "answer": "I do not have that information. The context facts indicate that Gantry Textiles has been headquartered in Stonewick (from 2015) and Wrenfield (from 2021), but no fact in the context covers 2010.",
+            "hit": false
+          },
+          {
+            "q": "Where was Harwick Instruments headquartered in 2016?",
+            "expect": "Elmsworth",
+            "answer": "Based on the context facts, Harwick Instruments was headquartered in **Dunmarsh**.\n\nThe relevant fact states: \"Harwick Instruments is headquartered in Dunmarsh [valid_from: 2022-01-01; confidence: derived; source: harwick_new]\"\n\nNote: The context fact has a valid_from date of 2022-01-01, so it does not specifically confirm the headquarters location in 2016. I do not have information about where Harwick Instruments was headquartered in 2016.",
+            "hit": false
+          },
+          {
+            "q": "Where was Ironvale Mining headquartered in 2016?",
+            "expect": "Fernbeck",
+            "answer": "According to the context facts, Ironvale Mining is headquartered in Ivorlan. This fact is valid from 2020-01-01, and since 2016 falls before this validity date, I do not have information about where Ironvale Mining was headquartered in 2016.",
+            "hit": false
+          },
+          {
+            "q": "Where was Kestrel Avionics headquartered in 2014?",
+            "expect": "Glenmoor",
+            "answer": "I do not have that information. The context facts indicate that Kestrel Avionics is headquartered in Hollowbrent, but this fact is only valid from 2018-01-01 onward. There is no information in the context about where Kestrel Avionics was headquartered in 2014.",
+            "hit": false
+          },
+          {
+            "q": "Where was Kestrel Avionics headquartered in 2019?",
+            "expect": "Hollowbrent",
+            "answer": "According to the context facts, Kestrel Avionics is headquartered in Hollowbrent (valid from 2018-01-01). Since 2019 falls within this validity period, Kestrel Avionics was headquartered in **Hollowbrent** in 2019.\n\nSource: kestrel_new",
+            "hit": true
+          },
+          {
+            "q": "Where was Meridian Systems headquartered in 2021?",
+            "expect": "Newhaven",
+            "answer": "According to the context facts, Meridian Systems is headquartered in Newhaven (valid from 2020-01-01). Therefore, in 2021, Meridian Systems was headquartered in **Newhaven**.\n\nSource: meridian_new",
+            "hit": true
           }
         ]
       }
@@ -135,8 +423,8 @@
       "name": "LlamaIndex",
       "kind": "vector RAG",
       "standard": {
-        "n": 4,
-        "score": 4,
+        "n": 20,
+        "score": 20,
         "rows": [
           {
             "q": "Where is Zephyr Logistics headquartered?",
@@ -159,37 +447,181 @@
           {
             "q": "Where is Vantor Foods headquartered?",
             "expect": "Draymoor",
-            "answer": "Draymoor",
+            "answer": "Vantor Foods is headquartered in Draymoor.",
+            "hit": true
+          },
+          {
+            "q": "Where is Ashgrove Metals headquartered?",
+            "expect": "Sablewood",
+            "answer": "Ashgrove Metals is headquartered in Sablewood.",
+            "hit": true
+          },
+          {
+            "q": "Where is Bluewick Energy headquartered?",
+            "expect": "Torvane",
+            "answer": "Torvane",
+            "hit": true
+          },
+          {
+            "q": "Where is Calder Dynamics headquartered?",
+            "expect": "Grelling",
+            "answer": "Grelling",
+            "hit": true
+          },
+          {
+            "q": "Where is Drayton Marine headquartered?",
+            "expect": "Ostmere",
+            "answer": "Ostmere",
+            "hit": true
+          },
+          {
+            "q": "Where is Ellsworth Biotech headquartered?",
+            "expect": "Pellworth",
+            "answer": "Pellworth",
+            "hit": true
+          },
+          {
+            "q": "Where is Foxbridge Capital headquartered?",
+            "expect": "Quillhaven",
+            "answer": "Foxbridge Capital is headquartered in Quillhaven.",
+            "hit": true
+          },
+          {
+            "q": "Where is Junewood Press headquartered?",
+            "expect": "Redfall",
+            "answer": "Redfall",
+            "hit": true
+          },
+          {
+            "q": "Where is Lorimer Shipping headquartered?",
+            "expect": "Saltmere",
+            "answer": "Saltmere",
+            "hit": true
+          },
+          {
+            "q": "Where is Marrowgate Pharma headquartered?",
+            "expect": "Thornmere",
+            "answer": "Thornmere",
+            "hit": true
+          },
+          {
+            "q": "Where is Northquay Insurance headquartered?",
+            "expect": "Umberley",
+            "answer": "Umberley",
+            "hit": true
+          },
+          {
+            "q": "Where is Oakhollow Farms headquartered?",
+            "expect": "Veldmoor",
+            "answer": "Oakhollow Farms is headquartered in Veldmoor.",
+            "hit": true
+          },
+          {
+            "q": "Where is Pinemont Software headquartered?",
+            "expect": "Wrenlow",
+            "answer": "Wrenlow",
+            "hit": true
+          },
+          {
+            "q": "Where is Quarrell Robotics headquartered?",
+            "expect": "Yarrowgate",
+            "answer": "Yarrowgate",
+            "hit": true
+          },
+          {
+            "q": "Where is Rushdale Media headquartered?",
+            "expect": "Zellwick",
+            "answer": "Zellwick",
+            "hit": true
+          },
+          {
+            "q": "Where is Silvermoor Textiles headquartered?",
+            "expect": "Brackenholt",
+            "answer": "Silvermoor Textiles is headquartered in Brackenholt.",
+            "hit": true
+          },
+          {
+            "q": "Where is Tarnwick Optics headquartered?",
+            "expect": "Caldbrook",
+            "answer": "Caldbrook",
             "hit": true
           }
         ]
       },
       "as_of": {
-        "n": 4,
+        "n": 12,
         "score": 0,
         "rows": [
           {
             "q": "Where was Meridian Systems headquartered in 2015?",
             "expect": "Calderport",
-            "answer": "I cannot answer this question based on the provided context. The context contains conflicting information about Meridian Systems' headquarters (stating both Calderport and Newhaven), and it does not specify any particular year, including 2015.",
+            "answer": "Based on the context, there is conflicting information: one statement says Meridian Systems is headquartered in Calderport, while another says it is headquartered in Newhaven. The context does not specify which location was correct in 2015, so I cannot definitively answer the query.",
             "hit": false
           },
           {
             "q": "Where was Orinoco Labs headquartered in 2013?",
             "expect": "Westfall",
-            "answer": "I cannot answer this question based on the provided context. The context states that Orinoco Labs is headquartered in Kingsford and also in Westfall, but it does not specify any information about where Orinoco Labs was headquartered in 2013.",
+            "answer": "I cannot answer this question based on the provided context. The context states that Orinoco Labs is headquartered in both Kingsford and Westfall, but it does not specify any information about where the company was headquartered in 2013.",
             "hit": false
           },
           {
             "q": "Where was Meridian Systems headquartered in 2011?",
             "expect": "Calderport",
-            "answer": "I cannot answer this question based on the provided context. The context contains conflicting information about Meridian Systems' headquarters (listing both Calderport and Newhaven), and it does not specify any particular year, including 2011.",
+            "answer": "Based on the context provided, there are two conflicting statements about Meridian Systems' headquarters: one says Calderport and the other says Newhaven. The context does not specify which location was correct in 2011, so I cannot definitively answer based on the information given.",
             "hit": false
           },
           {
             "q": "Where was Orinoco Labs headquartered in 2015?",
             "expect": "Westfall",
-            "answer": "I cannot answer this question based on the provided context. The context lists two different headquarters locations for Orinoco Labs (Kingsford and Westfall) but does not specify any time period, including 2015. Without information indicating which location was correct for that specific year, I cannot determine where Orinoco Labs was headquartered in 2015.",
+            "answer": "I cannot answer this question based on the provided context. The context lists two different headquarters locations for Orinoco Labs (Kingsford and Westfall), but it does not specify which year each location was valid. Without information indicating which headquarters applied in 2015 specifically, I cannot determine the correct answer.",
+            "hit": false
+          },
+          {
+            "q": "Where was Gantry Textiles headquartered in 2012?",
+            "expect": "Redmarsh",
+            "answer": "Based on the context provided, there are conflicting statements about Gantry Textiles' headquarters location. The context lists three different locations: Stonewick, Wrenfield, and Redmarsh. Without additional information to clarify which statement is accurate for 2012 specifically, I cannot definitively determine the correct headquarters location for that year.",
+            "hit": false
+          },
+          {
+            "q": "Where was Gantry Textiles headquartered in 2018?",
+            "expect": "Stonewick",
+            "answer": "Based on the context provided, there are conflicting statements about Gantry Textiles' headquarters location \u2014 Wrenfield, Stonewick, and Redmarsh are all mentioned. Without additional information to determine which is correct for 2018 specifically, I cannot definitively answer which location was its headquarters in 2018.",
+            "hit": false
+          },
+          {
+            "q": "Where was Gantry Textiles headquartered in 2010?",
+            "expect": "Redmarsh",
+            "answer": "Based on the context provided, there are three different locations listed for Gantry Textiles' headquarters: Wrenfield, Stonewick, and Redmarsh. The context does not specify which of these was the headquarters in 2010, so I cannot definitively answer which location was correct for that specific year.",
+            "hit": false
+          },
+          {
+            "q": "Where was Harwick Instruments headquartered in 2016?",
+            "expect": "Elmsworth",
+            "answer": "I cannot answer this question from the context provided. The context contains conflicting information about Harwick Instruments' headquarters (listing both Dunmarsh and Elmsworth), and it does not specify any particular year, including 2016.",
+            "hit": false
+          },
+          {
+            "q": "Where was Ironvale Mining headquartered in 2016?",
+            "expect": "Fernbeck",
+            "answer": "Ivorlan",
+            "hit": false
+          },
+          {
+            "q": "Where was Kestrel Avionics headquartered in 2014?",
+            "expect": "Glenmoor",
+            "answer": "I cannot answer this question based on the provided context. The context lists two different headquarters locations for Kestrel Avionics (Glenmoor and Hollowbrent) but does not specify which year each location was applicable, so there is no way to determine where the company was headquartered specifically in 2014.",
+            "hit": false
+          },
+          {
+            "q": "Where was Kestrel Avionics headquartered in 2019?",
+            "expect": "Hollowbrent",
+            "answer": "I cannot answer this question based on the provided context. The context contains conflicting information about Kestrel Avionics' headquarters (listing both Glenmoor and Hollowbrent), and it does not specify any time period such as 2019. Without additional information indicating which location was correct in 2019, I cannot determine the answer.",
+            "hit": false
+          },
+          {
+            "q": "Where was Meridian Systems headquartered in 2021?",
+            "expect": "Newhaven",
+            "answer": "Based on the context provided, there are two conflicting statements about Meridian Systems' headquarters: one says Newhaven and the other says Calderport. The context does not specify which year each statement refers to, so I cannot definitively determine where Meridian Systems was headquartered in 2021 based solely on the information given.",
             "hit": false
           }
         ]
@@ -199,8 +631,8 @@
       "name": "LangChain",
       "kind": "BM25 RAG",
       "standard": {
-        "n": 4,
-        "score": 4,
+        "n": 20,
+        "score": 20,
         "rows": [
           {
             "q": "Where is Zephyr Logistics headquartered?",
@@ -223,37 +655,181 @@
           {
             "q": "Where is Vantor Foods headquartered?",
             "expect": "Draymoor",
-            "answer": "Draymoor.",
+            "answer": "Draymoor",
+            "hit": true
+          },
+          {
+            "q": "Where is Ashgrove Metals headquartered?",
+            "expect": "Sablewood",
+            "answer": "Sablewood",
+            "hit": true
+          },
+          {
+            "q": "Where is Bluewick Energy headquartered?",
+            "expect": "Torvane",
+            "answer": "Torvane",
+            "hit": true
+          },
+          {
+            "q": "Where is Calder Dynamics headquartered?",
+            "expect": "Grelling",
+            "answer": "Grelling",
+            "hit": true
+          },
+          {
+            "q": "Where is Drayton Marine headquartered?",
+            "expect": "Ostmere",
+            "answer": "Ostmere",
+            "hit": true
+          },
+          {
+            "q": "Where is Ellsworth Biotech headquartered?",
+            "expect": "Pellworth",
+            "answer": "Pellworth.",
+            "hit": true
+          },
+          {
+            "q": "Where is Foxbridge Capital headquartered?",
+            "expect": "Quillhaven",
+            "answer": "Quillhaven",
+            "hit": true
+          },
+          {
+            "q": "Where is Junewood Press headquartered?",
+            "expect": "Redfall",
+            "answer": "Redfall.",
+            "hit": true
+          },
+          {
+            "q": "Where is Lorimer Shipping headquartered?",
+            "expect": "Saltmere",
+            "answer": "Saltmere.",
+            "hit": true
+          },
+          {
+            "q": "Where is Marrowgate Pharma headquartered?",
+            "expect": "Thornmere",
+            "answer": "Thornmere.",
+            "hit": true
+          },
+          {
+            "q": "Where is Northquay Insurance headquartered?",
+            "expect": "Umberley",
+            "answer": "Umberley.",
+            "hit": true
+          },
+          {
+            "q": "Where is Oakhollow Farms headquartered?",
+            "expect": "Veldmoor",
+            "answer": "Veldmoor",
+            "hit": true
+          },
+          {
+            "q": "Where is Pinemont Software headquartered?",
+            "expect": "Wrenlow",
+            "answer": "Wrenlow.",
+            "hit": true
+          },
+          {
+            "q": "Where is Quarrell Robotics headquartered?",
+            "expect": "Yarrowgate",
+            "answer": "Yarrowgate.",
+            "hit": true
+          },
+          {
+            "q": "Where is Rushdale Media headquartered?",
+            "expect": "Zellwick",
+            "answer": "Zellwick.",
+            "hit": true
+          },
+          {
+            "q": "Where is Silvermoor Textiles headquartered?",
+            "expect": "Brackenholt",
+            "answer": "Brackenholt.",
+            "hit": true
+          },
+          {
+            "q": "Where is Tarnwick Optics headquartered?",
+            "expect": "Caldbrook",
+            "answer": "Caldbrook.",
             "hit": true
           }
         ]
       },
       "as_of": {
-        "n": 4,
+        "n": 12,
         "score": 0,
         "rows": [
           {
             "q": "Where was Meridian Systems headquartered in 2015?",
             "expect": "Calderport",
-            "answer": "I cannot answer this question. The facts state that Meridian Systems is headquartered in both Newhaven and Calderport, which conflict, and neither fact specifies a year (such as 2015).",
+            "answer": "I cannot answer. The facts conflict: one says Meridian Systems is headquartered in Newhaven, another says Calderport.",
             "hit": false
           },
           {
             "q": "Where was Orinoco Labs headquartered in 2013?",
             "expect": "Westfall",
-            "answer": "I cannot answer. The facts state that Orinoco Labs is headquartered in both Kingsford and Westfall, which conflict, and neither specifies the year 2013.",
+            "answer": "I cannot answer this question. The provided facts state that Orinoco Labs is headquartered in both Kingsford and Westfall, which is contradictory, and neither fact specifies the year 2013.",
             "hit": false
           },
           {
             "q": "Where was Meridian Systems headquartered in 2011?",
             "expect": "Calderport",
-            "answer": "I cannot answer this question. The facts state that Meridian Systems is headquartered in both Newhaven and Calderport, which conflict, and neither fact specifies a year.",
+            "answer": "I cannot answer. The facts conflict: one states Meridian Systems is headquartered in Newhaven, another in Calderport.",
             "hit": false
           },
           {
             "q": "Where was Orinoco Labs headquartered in 2015?",
             "expect": "Westfall",
-            "answer": "I cannot answer. The facts state Orinoco Labs is headquartered in both Kingsford and Westfall, which conflict, and neither specifies a year.",
+            "answer": "I cannot answer. The facts conflict: Orinoco Labs is listed as headquartered in both Kingsford and Westfall.",
+            "hit": false
+          },
+          {
+            "q": "Where was Gantry Textiles headquartered in 2012?",
+            "expect": "Redmarsh",
+            "answer": "I cannot answer this question. The facts state that Gantry Textiles is headquartered in Wrenfield, Redmarsh, and Stonewick, but they do not specify which location applied in 2012 or provide any time-specific information.",
+            "hit": false
+          },
+          {
+            "q": "Where was Gantry Textiles headquartered in 2018?",
+            "expect": "Stonewick",
+            "answer": "I cannot answer this question. The facts state that Gantry Textiles is headquartered in Wrenfield, Redmarsh, and Stonewick, but they do not specify which location applied in 2018.",
+            "hit": false
+          },
+          {
+            "q": "Where was Gantry Textiles headquartered in 2010?",
+            "expect": "Redmarsh",
+            "answer": "I cannot answer this question. The facts state that Gantry Textiles is headquartered in Wrenfield, Redmarsh, and Stonemarsh, but they do not specify which location applied in 2010.",
+            "hit": false
+          },
+          {
+            "q": "Where was Harwick Instruments headquartered in 2016?",
+            "expect": "Elmsworth",
+            "answer": "I cannot answer. The facts conflict about Harwick Instruments' headquarters (Dunmarsh vs. Elmsworth) and do not specify a year.",
+            "hit": false
+          },
+          {
+            "q": "Where was Ironvale Mining headquartered in 2016?",
+            "expect": "Fernbeck",
+            "answer": "I cannot answer. The facts conflict: Ironvale Mining is listed as headquartered in both Ivorlan and Fernbeck.",
+            "hit": false
+          },
+          {
+            "q": "Where was Kestrel Avionics headquartered in 2014?",
+            "expect": "Glenmoor",
+            "answer": "I cannot answer. The facts conflict: Kestrel Avionics is listed as being headquartered in both Hollowbrent and Glenmoor, and no information specifies the year 2014.",
+            "hit": false
+          },
+          {
+            "q": "Where was Kestrel Avionics headquartered in 2019?",
+            "expect": "Hollowbrent",
+            "answer": "I cannot answer this question. The facts state that Kestrel Avionics is headquartered in both Hollowbrent and Glenmoor, which conflict, and neither fact specifies the year 2019.",
+            "hit": false
+          },
+          {
+            "q": "Where was Meridian Systems headquartered in 2021?",
+            "expect": "Newhaven",
+            "answer": "I cannot answer. The facts conflict: one states Meridian Systems is headquartered in Newhaven, another states Calderport.",
             "hit": false
           }
         ]
@@ -263,8 +839,8 @@
       "name": "Haystack",
       "kind": "BM25 RAG",
       "standard": {
-        "n": 4,
-        "score": 4,
+        "n": 20,
+        "score": 20,
         "rows": [
           {
             "q": "Where is Zephyr Logistics headquartered?",
@@ -275,7 +851,7 @@
           {
             "q": "Where is Corvus Analytics headquartered?",
             "expect": "Fenwick",
-            "answer": "Fenwick",
+            "answer": "Fenwick.",
             "hit": true
           },
           {
@@ -289,35 +865,179 @@
             "expect": "Draymoor",
             "answer": "Draymoor",
             "hit": true
+          },
+          {
+            "q": "Where is Ashgrove Metals headquartered?",
+            "expect": "Sablewood",
+            "answer": "Ashgrove Metals is headquartered in Sablewood.",
+            "hit": true
+          },
+          {
+            "q": "Where is Bluewick Energy headquartered?",
+            "expect": "Torvane",
+            "answer": "Torvane",
+            "hit": true
+          },
+          {
+            "q": "Where is Calder Dynamics headquartered?",
+            "expect": "Grelling",
+            "answer": "Grelling",
+            "hit": true
+          },
+          {
+            "q": "Where is Drayton Marine headquartered?",
+            "expect": "Ostmere",
+            "answer": "Ostmere",
+            "hit": true
+          },
+          {
+            "q": "Where is Ellsworth Biotech headquartered?",
+            "expect": "Pellworth",
+            "answer": "Pellworth",
+            "hit": true
+          },
+          {
+            "q": "Where is Foxbridge Capital headquartered?",
+            "expect": "Quillhaven",
+            "answer": "Quillhaven",
+            "hit": true
+          },
+          {
+            "q": "Where is Junewood Press headquartered?",
+            "expect": "Redfall",
+            "answer": "Junewood Press is headquartered in Redfall.",
+            "hit": true
+          },
+          {
+            "q": "Where is Lorimer Shipping headquartered?",
+            "expect": "Saltmere",
+            "answer": "Saltmere.",
+            "hit": true
+          },
+          {
+            "q": "Where is Marrowgate Pharma headquartered?",
+            "expect": "Thornmere",
+            "answer": "Thornmere",
+            "hit": true
+          },
+          {
+            "q": "Where is Northquay Insurance headquartered?",
+            "expect": "Umberley",
+            "answer": "Northquay Insurance is headquartered in Umberley.",
+            "hit": true
+          },
+          {
+            "q": "Where is Oakhollow Farms headquartered?",
+            "expect": "Veldmoor",
+            "answer": "Oakhollow Farms is headquartered in Veldmoor.",
+            "hit": true
+          },
+          {
+            "q": "Where is Pinemont Software headquartered?",
+            "expect": "Wrenlow",
+            "answer": "Wrenlow",
+            "hit": true
+          },
+          {
+            "q": "Where is Quarrell Robotics headquartered?",
+            "expect": "Yarrowgate",
+            "answer": "Yarrowgate",
+            "hit": true
+          },
+          {
+            "q": "Where is Rushdale Media headquartered?",
+            "expect": "Zellwick",
+            "answer": "Zellwick",
+            "hit": true
+          },
+          {
+            "q": "Where is Silvermoor Textiles headquartered?",
+            "expect": "Brackenholt",
+            "answer": "Brackenholt",
+            "hit": true
+          },
+          {
+            "q": "Where is Tarnwick Optics headquartered?",
+            "expect": "Caldbrook",
+            "answer": "Caldbrook.",
+            "hit": true
           }
         ]
       },
       "as_of": {
-        "n": 4,
+        "n": 12,
         "score": 0,
         "rows": [
           {
             "q": "Where was Meridian Systems headquartered in 2015?",
             "expect": "Calderport",
-            "answer": "I cannot answer this question. The provided facts state that Meridian Systems is headquartered in both Calderport and Newhaven, which is a conflict. Additionally, neither fact specifies a year, so I cannot determine where Meridian Systems was headquartered in 2015 specifically.",
+            "answer": "I cannot answer this question. The provided facts conflict regarding Meridian Systems' headquarters (Calderport vs. Newhaven), and neither fact specifies a year of 2015.",
             "hit": false
           },
           {
             "q": "Where was Orinoco Labs headquartered in 2013?",
             "expect": "Westfall",
-            "answer": "I cannot answer this question. The provided facts state that Orinoco Labs is headquartered in both Westfall and Kingsford, which is a contradiction. Additionally, neither fact specifies the year 2013.",
+            "answer": "I cannot answer this question. The provided facts state that Orinoco Labs is headquartered in both Westfall and Kingsford, which conflict with each other. Additionally, neither fact specifies a year, so I cannot confirm where Orinoco Labs was headquartered in 2013 specifically.",
             "hit": false
           },
           {
             "q": "Where was Meridian Systems headquartered in 2011?",
             "expect": "Calderport",
-            "answer": "I cannot answer this question. The provided facts state that Meridian Systems is headquartered in both Calderport and Newhaven, which is contradictory. Additionally, neither fact specifies a year (2011), so I cannot determine which headquarters location was applicable at that time.",
+            "answer": "I cannot answer this question. The provided facts state that Meridian Systems is headquartered in both Calderport and Newhaven, which is a contradiction. Additionally, neither fact specifies a year (such as 2011), so I cannot determine where Meridian Systems was headquartered in 2011.",
             "hit": false
           },
           {
             "q": "Where was Orinoco Labs headquartered in 2015?",
             "expect": "Westfall",
-            "answer": "I cannot answer this question. The provided facts conflict regarding Orinoco Labs' headquarters, listing both Westfall and Kingsford, and neither fact specifies a year of 2015.",
+            "answer": "I cannot answer. The provided facts conflict regarding Orinoco Labs' headquarters (Westfall vs. Kingsford), and neither fact specifies a year of 2015.",
+            "hit": false
+          },
+          {
+            "q": "Where was Gantry Textiles headquartered in 2012?",
+            "expect": "Redmarsh",
+            "answer": "I cannot answer. The provided facts conflict regarding Gantry Textiles' headquarters (Redmarsh, Stonewick, and Wrenfield are all listed), and none of them specify the year 2012.",
+            "hit": false
+          },
+          {
+            "q": "Where was Gantry Textiles headquartered in 2018?",
+            "expect": "Stonewick",
+            "answer": "I cannot answer this question. The provided facts state that Gantry Textiles is headquartered in Redmarsh, Stonewick, and Wrenfield, but these are contradictory and do not specify the year 2018.",
+            "hit": false
+          },
+          {
+            "q": "Where was Gantry Textiles headquartered in 2010?",
+            "expect": "Redmarsh",
+            "answer": "I cannot answer this question. The provided facts state that Gantry Textiles is headquartered in Redmarsh, Stonewick, and Wrenfield, which conflict with each other and do not specify a time period such as 2010.",
+            "hit": false
+          },
+          {
+            "q": "Where was Harwick Instruments headquartered in 2016?",
+            "expect": "Elmsworth",
+            "answer": "I cannot answer this question because the provided facts conflict with each other regarding Harwick Instruments' headquarters location (one states Elmsworth, another states Dunmarsh).",
+            "hit": false
+          },
+          {
+            "q": "Where was Ironvale Mining headquartered in 2016?",
+            "expect": "Fernbeck",
+            "answer": "I cannot answer this question. The provided facts state that Ironvale Mining is headquartered in both Fernbeck and Ivorlan, which conflict with each other, and neither fact specifies the year 2016.",
+            "hit": false
+          },
+          {
+            "q": "Where was Kestrel Avionics headquartered in 2014?",
+            "expect": "Glenmoor",
+            "answer": "I cannot answer this question. The provided facts state that Kestrel Avionics is headquartered in both Glenmoor and Hollowbrent, which conflict with each other, and neither fact specifies a year such as 2014.",
+            "hit": false
+          },
+          {
+            "q": "Where was Kestrel Avionics headquartered in 2019?",
+            "expect": "Hollowbrent",
+            "answer": "I cannot answer. The provided facts conflict: Kestrel Avionics is listed as being headquartered in both Glenmoor and Hollowbrent.",
+            "hit": false
+          },
+          {
+            "q": "Where was Meridian Systems headquartered in 2021?",
+            "expect": "Newhaven",
+            "answer": "I cannot answer. The provided facts conflict regarding Meridian Systems' headquarters, listing both Calderport and Newhaven.",
             "hit": false
           }
         ]
