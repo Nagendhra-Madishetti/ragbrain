@@ -70,6 +70,10 @@ from cogniflow.rerankers import available_rerankers  # noqa: E402
 from cogniflow.serving.audit import serialize_belief, serialize_trace  # noqa: E402
 
 DEFAULT_EMBEDDER = "bge-m3" if os.getenv("COGNIFLOW_EMBEDDER_API_KEY") else "hash"
+# FalkorDB location for the raw admin pings (health/reset). The per-session backend reads the
+# same env via config; keeping them consistent is what lets FalkorDB be a compose service.
+_FALKOR_HOST = os.getenv("COGNIFLOW_FALKORDB_HOST", "localhost")
+_FALKOR_PORT = int(os.getenv("COGNIFLOW_FALKORDB_PORT", "6379"))
 
 app = FastAPI(title="Cogniflow Playground API", version="0.1.0")
 app.add_middleware(
@@ -291,7 +295,7 @@ async def health() -> dict:
     try:
         from falkordb import FalkorDB
 
-        FalkorDB(host="localhost", port=6379).select_graph("__ping__").query("RETURN 1")
+        FalkorDB(host=_FALKOR_HOST, port=_FALKOR_PORT).select_graph("__ping__").query("RETURN 1")
         falkordb = True
     except Exception:
         pass
@@ -552,7 +556,6 @@ async def demo_seed(
 ) -> dict:
     _guard(session_id, token)
     backend = await _backend(session_id)
-    gid = backend.group_id
     if not force:
         try:
             known = await backend.system_time_replay(datetime.now(timezone.utc))
@@ -560,6 +563,20 @@ async def demo_seed(
                 return await _demo_payload(backend)
         except Exception:
             pass
+    # Seed onto a CLEAN graph so the hero is deterministic regardless of prior/partial state
+    # (a container restart, a half-seed). Drop the group, then rebuild the backend on it.
+    sess = _SESSIONS.get(session_id)
+    if sess and sess["backend"] is not None:
+        await sess["backend"].close()
+        sess["backend"] = None
+    try:
+        from falkordb import FalkorDB
+
+        FalkorDB(host=_FALKOR_HOST, port=_FALKOR_PORT).select_graph(f"pg_{session_id}").delete()
+    except Exception:
+        pass
+    backend = await _backend(session_id)
+    gid = backend.group_id
     drv = backend._driver
     for node_uuid, node_name in (
         ("demo-ent-acme", "Acme Corp"),
@@ -611,7 +628,7 @@ async def reset(session_id: str, token: str | None = Depends(require_auth)) -> d
     try:
         from falkordb import FalkorDB
 
-        FalkorDB(host="localhost", port=6379).select_graph(f"pg_{session_id}").delete()
+        FalkorDB(host=_FALKOR_HOST, port=_FALKOR_PORT).select_graph(f"pg_{session_id}").delete()
     except Exception:
         pass
     # keep config + OWNERSHIP across a reset (else another token could re-claim the session)
