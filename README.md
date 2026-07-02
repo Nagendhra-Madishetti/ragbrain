@@ -1,212 +1,224 @@
 <div align="center">
 
+<img src="docs/media/logo.png" alt="Cogniflow" width="180" />
+
 # Cogniflow
 
-### Prove what your AI knew - and when.
+**The bi-temporal RAG platform. Prove what your AI knew, and when.**
 
-**The bi-temporal RAG platform.** Any document in → a cited, temporally-correct answer out - 
-plus the one thing a plain RAG cannot do: **replay what the system believed at any past
-moment**, without leaking later corrections into the past.
+Any document in, a cited and temporally-correct answer out, plus the capability the rest of
+the field lacks: replay what the system believed at any past moment, without leaking later
+corrections into the past.
 
 [![ci](https://github.com/Nagendhra-web/cogniflow/actions/workflows/ci.yml/badge.svg)](https://github.com/Nagendhra-web/cogniflow/actions/workflows/ci.yml)
 [![license](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](pyproject.toml)
 
-[60-second demo](#-60-second-demo-from-nothing) ·
-[How it works](#-architecture) ·
-[API](#-api-curl--against-the-secure-by-default-server) ·
-[Honest limitations](#-honest-limitations)
+[Quick start](#quick-start) ·
+[Architecture](#architecture) ·
+[Benchmarks](#benchmarks) ·
+[API](#api) ·
+[Documentation](#documentation)
 
 </div>
 
 ---
 
+## Why Cogniflow
 
-## Why
+Every fact is stored on two independent time axes: when it was true in the world (event
+time) and when the system learned it (system time). The second axis is what makes answers
+defensible rather than merely plausible.
 
-Every fact in Cogniflow lives on **two independent time axes** - *when it was true in the
-world* (event time) and *when the system learned it* (system time). That second axis is what
-the rest of the RAG field doesn't have, and it's what makes answers **defensible**, not just
-plausible.
-
-Take one fact that changed: Acme Corp's HQ was **Boston** (2019 filing), then **Denver**
+Consider one fact that changed: Acme Corp's HQ was Boston (2019 filing), then Denver
 (2022 filing).
 
-| Question | Plain / vector RAG | Valid-time ("temporal") RAG | **Cogniflow** |
+| Question | Vector RAG | Valid-time RAG | Cogniflow |
 |---|---|---|---|
-| Where is Acme HQ **now**? | ✅ Denver | ✅ Denver | ✅ Denver |
-| Where was it **in 2020**? | ❌ | ✅ Boston | ✅ Boston |
-| What did we **believe in 2021**, before the 2022 filing? | ❌ | ❌ | ✅ **Boston** (Denver un-known) |
-| Show the timeline + what superseded what | ❌ | partial | ✅ provenance + audit |
+| Where is Acme HQ now? | Denver | Denver | Denver |
+| Where was it in 2020? | not answerable | Boston | Boston |
+| What did we believe in 2021, before the 2022 filing? | not answerable | not answerable | **Boston, Denver un-known** |
+| Show the timeline and what superseded what | no | partial | full provenance and audit |
 
-The third row is **system-time replay**. It requires an independent record of *when each fact
-was learned* - and the discipline never to let a later correction leak into a past belief
-(the **un-knowing invariant**, enforced in CI). No mainstream RAG stack ships this.
+The third row is system-time replay. It requires an independent record of when each fact was
+learned, and the discipline never to let a later correction leak into a past belief state:
+the un-knowing invariant, enforced in CI against a live graph store.
 
-## What you get
+## Capabilities
 
-- **Bi-temporal knowledge graph** - four timestamps per fact (`valid_at`/`invalid_at`,
-  `created_at`/`expired_at`), stored in FalkorDB or Neo4j.
-- **As-of retrieval** - ask any question *as of* any instant; context is validity-filtered
+- **Bi-temporal knowledge graph.** Four timestamps per fact (`valid_at`, `invalid_at`,
+  `created_at`, `expired_at`) in FalkorDB or Neo4j.
+- **As-of retrieval.** Ask any question as of any instant; context is validity-filtered
   before ranking.
-- **System-time replay & audit** - reconstruct what the system believed at any past moment;
+- **System-time replay and audit.** Reconstruct what the system believed at any past moment;
   a live web scrubber makes it visible.
-- **Supersession with provenance** - a correcting fact expires the old one and stamps a
-  `superseded_by` back-link at write time; every answer carries its citations.
-- **Cited, grounded generation** - answers built only from the served, as-of-filtered facts,
-  with per-fact confidence labels.
-- **Everything is a plug** - embedder, reranker, generation model, and graph backend are
-  config-selected and fail-loud; bring hosted APIs or fully local models.
-- **Secure by default** - bearer-token auth, token-scoped sessions, rate limits, upload caps
-  (baseline security for trusted environments - see [SECURITY.md](SECURITY.md)).
-- **Self-hostable end to end** - your documents, your models, your infrastructure; nothing
-  leaves your network.
+- **Supersession with provenance.** A correcting fact expires the old one and stamps a
+  `superseded_by` back-link at write time; every answer carries citations.
+- **Checked generation.** Answers are verified claim-by-claim against the served facts after
+  generation; unsupported claims are flagged, never silently shipped.
+- **Pluggable everything.** Embedder, reranker, generation model, and graph backend are
+  config-selected and fail loud; bring hosted APIs or fully local models.
+- **Secure by default.** Bearer-token auth, token-scoped sessions, rate limits, upload caps.
+- **Multi-replica ready.** Shared session state and a shared durable write-back journal,
+  proven by a two-replica test; a metrics endpoint for operations.
+- **Self-hostable end to end.** Your documents, your models, your infrastructure.
 
-## ⚡ 60-second demo (from nothing)
+## Quick start
 
-Prereqs: Docker. No `.env`, no API keys - the hero scenario is **key-free**.
+Prereqs: Docker. No API keys required for the demo.
 
 ```bash
 git clone https://github.com/Nagendhra-web/cogniflow && cd cogniflow
-docker compose up -d --build # FalkorDB + API + web, secure-by-default (auth ON)
-bash scripts/demo.sh # waits for the API, seeds Acme, asserts the four questions
+docker compose up -d --build
+bash scripts/demo.sh
 ```
 
-`scripts/demo.sh` prints (and asserts):
+The demo seeds the Acme scenario and asserts four answers:
 
 ```
-Q1 now -> Denver
-Q2 as of 2020 -> Boston
-Q3 replay(2021) -> Boston << the 2022 Denver correction is un-known
-Q4 timeline -> Boston (2019 report) superseded by Denver (2022 press release)
+now              -> Denver
+as of 2020       -> Boston
+replay(2021)     -> Boston   (the 2022 Denver correction is un-known)
+timeline         -> Boston (2019 report) superseded by Denver (2022 press release)
 ```
 
-Then open the **live scrubber** at <http://localhost:3000/playground> and drag the
-system-time slider across 2022 - the answer flips Boston↔Denver in front of you:
+Open the live scrubber at http://localhost:3000/playground and drag the system-time slider
+across 2022; the answer flips in front of you:
 
 ![System-time replay: scrubbing past the 2022 correction flips the belief Boston to Denver](docs/media/replay-scrubber.gif)
 
-> **Deployment honesty:** `docker compose up` stands up the whole stack for a **local /
-> trusted environment**. For multi-replica, `COGNIFLOW_SHARED_STATE=1` moves session
-> ownership/config and rate limits into Redis (the FalkorDB server) and `RedisJournal` makes
-> the write-back queue durable and shared - proven by a two-replica test
-> (`docker compose -f docker-compose.yml -f docker-compose.replicas.yml up -d --build` then
-> `bash scripts/two_replica_proof.sh`). A `/metrics` endpoint gives the ops floor. That makes
-> the shell **production-deployable** - still **not "enterprise"**: RBAC, access-audit
-> logging, GDPR deletion, and certified isolation remain out of scope (see
-> [SECURITY.md](SECURITY.md)).
-
-## 🏗 Architecture
-
-<img width="1060" height="923" alt="image" src="https://github.com/user-attachments/assets/d750bfd0-349c-4786-a881-206cc62b1aee" />
-
-
-**The core is dependency-free.** `cogniflow.core` imports only the standard library; heavy
-dependencies (`graphiti-core`, `falkordb`, `llama-index-core`) live behind optional extras in
-*backends* and *bridges*.
-
-### The bitemporal model, in four lines
-
-- **Event time** `[valid_at, invalid_at)` - when the fact was true in the world → "as of 2020."
-- **System time** `[created_at, expired_at)` - when the system learned/retracted it → "what
-  did we believe at S," and the un-knowing replay.
-- A correction **supersedes**: the old fact gets `invalid_at` (event) *and* `expired_at`
-  (system) plus a `superseded_by` back-link, stamped at write time.
-- Replay to S drops everything learned after S - **including the knowledge that a fact was
-  later corrected**. That's the invariant.
-
-## 📄 Use it on your own documents (local - your data never leaves)
+### Install as a library
 
 ```bash
-# 1. real generation + retrieval need providers (the seeded hero does not). Put keys in .env:
-cp .env.example .env # set COGNIFLOW_LLM_API_KEY and, for semantic retrieval, an embedder
-
-# 2. ingest a document with the date its facts were true, then ask at different as-of dates
-TOKEN=cogniflow-demo-token
-curl -H "Authorization: Bearer $TOKEN" -F session_id=mine -F reference_time=2019-01-01 \
-     -F file=@your_report.pdf http://localhost:8000/api/ingest
+pip install cogniflow-rag          # import cogniflow
+pip install "cogniflow-rag[all,serve]"   # backends + the platform API
 ```
 
-**Retrieval quality needs a real embedder.** Cogniflow boots on the key-free `hash` embedder
-so the engine runs dependency-free - but hash is **meaning-blind** (lexical, not semantic) and
-it **warns loudly** at startup and in every response until you configure one:
+## Architecture
 
-- **key-free, needs torch** - `pip install -e ".[embeddings]"`, then `COGNIFLOW_EMBEDDER=bge-m3-local`
-- **dependency-light, needs a key** - `COGNIFLOW_EMBEDDER=bge-m3` + `COGNIFLOW_EMBEDDER_API_KEY=…`
+<img width="1060" height="923" alt="Cogniflow architecture" src="https://github.com/user-attachments/assets/d750bfd0-349c-4786-a881-206cc62b1aee" />
 
-A real embedder fixes **retrieval** (which facts come back). It does not lift the prose
-**extraction** floor (bounded by the LLM, and labeled per fact via `valid_at_source`).
-See [docs/EMBEDDERS.md](docs/EMBEDDERS.md).
+```
+                          +---------------------------------------------+
+   PDF / MD / text  ----> | INGEST    parse -> structure-preserving      |
+   (+ the date true)      |           chunks -> Episodes                 |
+                          +---------------------+-----------------------+
+                                                |
+                                                v
+                          +---------------------------------------------+
+                          | WRITE     extraction + contradiction resolve |
+                          |   stamps  valid_at / invalid_at  (EVENT)     |
+                          |           created_at / expired_at (SYSTEM)   |
+                          |   correction -> expire old + superseded_by   |
+                          +---------------------+-----------------------+
+                                                |
+                                                v
+                          +---------------------------------------------+
+                          | STORE     FalkorDB (per-group graph) | Neo4j |
+                          +---------+-----------------------+-----------+
+                relevance path      |                       |   audit path (direct temporal scan)
+                                    v                       v
+              +------------------------------+   +------------------------------------+
+              | RETRIEVE  serve_context      |   | REPLAY   event_time_query(T)        |
+              |  as-of validity filter       |   |          valid_at <= T              |
+              |  -> rank -> grounded         |   |          system_time_replay(S)      |
+              |  generation -> faithfulness  |   |          created_at <= S            |
+              |  check -> cited answer       |   |          + un-know post-S changes   |
+              +------------------------------+   |  -> audit API + web scrubber        |
+                                                 +------------------------------------+
+```
 
-## 🔌 API (curl) - against the secure-by-default server
+The core is dependency-free: `cogniflow.core` imports only the standard library. Storage,
+models, and retrieval are adapters behind stable interfaces, selected by configuration.
 
-Every route but `/api/health` needs the bearer token (`COGNIFLOW_API_TOKENS`; the compose
-provisions `cogniflow-demo-token`). A session is scoped to the token that created it.
+### The bi-temporal model
+
+- Event time `[valid_at, invalid_at)`: when the fact was true in the world. Answers
+  "as of 2020".
+- System time `[created_at, expired_at)`: when the system learned or retracted it. Answers
+  "what did we believe at S" and powers the un-knowing replay.
+- A correction supersedes: the old fact receives `invalid_at` (event) and `expired_at`
+  (system) plus a `superseded_by` back-link, stamped at write time.
+- Replay to S drops everything learned after S, including the knowledge that a fact was
+  later corrected. That is the invariant, enforced two ways: as pure deterministic tests and
+  live against a FalkorDB service in CI (`tests/integration/test_replay_seeded.py`).
+
+## Benchmarks
+
+All published numbers come from live, reproducible runs on a fictional corpus (invented
+companies, dates only in metadata), so no model can answer from training. Results carry a
+content hash and a reproduce command; scores are claims exactly the size of the measurement.
+
+| Comparison | Chart |
+|---|---|
+| As-of questions vs LlamaIndex, LangChain, Haystack, and a temporal-graph ablation | ![As-of benchmark](docs/media/benchmark-asof.png) |
+| Current-fact questions (the honest tie) | ![Standard benchmark](docs/media/benchmark-standard.png) |
+
+Reproduce: `python demo/benchmark_frameworks.py`. Full per-question answers, methodology,
+and the measured evaluation floors (verify recall, faithfulness checker precision and recall)
+are in the web app's Benchmark page and [PROJECT_STATUS.md](PROJECT_STATUS.md).
+
+## API
+
+Every route except `/api/health` requires a bearer token (`COGNIFLOW_API_TOKENS`; the compose
+stack provisions `cogniflow-demo-token`). A session is scoped to the token that created it.
 
 ```bash
 TOKEN=cogniflow-demo-token
 API=http://localhost:8000
 H="Authorization: Bearer $TOKEN"
 
-# seed the demo (key-free), then the four questions:
 curl -H "$H" -X POST "$API/api/demo/seed"
-curl -H "$H" "$API/api/audit/current?session_id=demo_acme" # -> Denver (now)
-curl -H "$H" "$API/api/audit/event?session_id=demo_acme&as_of=2020-06-01" # -> Boston (event time)
-curl -H "$H" "$API/api/audit/replay?session_id=demo_acme&system_time=2021-06-01" # -> Boston (system-time replay)
-curl -H "$H" "$API/api/audit/timeline/demo-belief-boston?session_id=demo_acme" # -> provenance + supersession
+curl -H "$H" "$API/api/audit/current?session_id=demo_acme"
+curl -H "$H" "$API/api/audit/event?session_id=demo_acme&as_of=2020-06-01"
+curl -H "$H" "$API/api/audit/replay?session_id=demo_acme&system_time=2021-06-01"
+curl -H "$H" "$API/api/audit/timeline/demo-belief-boston?session_id=demo_acme"
 
-# temporally-correct CONTEXT for your own model (facts, not a generated answer):
 curl -H "$H" -H 'Content-Type: application/json' -X POST "$API/api/context" \
      -d '{"session_id":"mine","query":"Where is Acme headquartered?","as_of":"2020-06-01"}'
 ```
 
-Omit the token → `401`. Use another token against a session you don't own → `403`.
-
-## ✅ The invariant we enforce
-
-The headline property is the **un-knowing invariant**: replaying to a system-time *before* a
-correction returns what was believed then, and does **not** leak the later invalidation
-backward. Enforced two ways:
-
-- **Pure** - [`tests/test_audit_replay.py`](tests/test_audit_replay.py) /
-  [`tests/test_validity_policy.py`](tests/test_validity_policy.py): the reconstruction and
-  as-of semantics as deterministic functions (no infra).
-- **Live** - [`tests/integration/test_replay_seeded.py`](tests/integration/test_replay_seeded.py):
-  the same invariant end-to-end against a real **FalkorDB** service with **no LLM key**, in
-  the `replay-invariant` job of [`ci.yml`](.github/workflows/ci.yml). If replay ever leaks a
-  later correction into the past, CI goes red.
-
-```
-replay(2021) -> Boston (invalid_at un-known; the 2022 move not yet learned)
-replay(2023) -> Denver (the correction is now known)
-```
-
-## ⚠ Honest limitations
-
-- **Baseline security, not enterprise.** Bearer auth + scoped sessions + rate limits + upload
-  caps - safe in a *trusted environment*. RBAC, access-audit logging, GDPR deletion, SOC2,
-  and certified isolation are not here. See [SECURITY.md](SECURITY.md).
-- **Not production HA.** In-memory session state + in-process queue break multi-replica; the
-  scale re-architecture is on the roadmap.
-- **Contradiction detection is an LLM call** - reliable on structured input, best-effort on
-  prose. `verify_fact`'s measured recall floor is tracked, un-massaged, in
-  [PROJECT_STATUS.md](PROJECT_STATUS.md).
-- **Generation grounding is prompt-instruction only** (a post-hoc faithfulness check is the
-  next major roadmap item).
-- Full defect ledger: [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md).
-
-## 🛠 Development
+Ingest your own documents (local; data never leaves your environment):
 
 ```bash
-pip install -e ".[dev]" # dependency-free core + dev tools
-ruff check .
-pytest # contracts + conformance; integration tests self-skip without infra
+cp .env.example .env    # provider keys for generation and semantic retrieval
+curl -H "$H" -F session_id=mine -F reference_time=2019-01-01 \
+     -F file=@your_report.pdf "$API/api/ingest"
 ```
 
-Every number this project publishes comes from a live run - benchmarks carry a content hash
-and a reproduce command. Extend it without touching core:
-[CONTRIBUTING.md](CONTRIBUTING.md) · [docs/EXTENDING.md](docs/EXTENDING.md) ·
-[PROJECT_STATUS.md](PROJECT_STATUS.md).
+For semantic retrieval configure a real embedder: `COGNIFLOW_EMBEDDER=bge-m3-local`
+(key-free, requires the `[embeddings]` extra) or `COGNIFLOW_EMBEDDER=bge-m3` with
+`COGNIFLOW_EMBEDDER_API_KEY`. The key-free boot default (`hash`) is lexical and states so
+loudly in every response until a real embedder is configured.
+
+## Deployment
+
+- Local and trusted environments: `docker compose up -d --build`.
+- Multi-replica: `docker compose -f docker-compose.yml -f docker-compose.replicas.yml up -d`
+  with `COGNIFLOW_SHARED_STATE=1`; verify with `bash scripts/two_replica_proof.sh`.
+- Operations: an authenticated `/metrics` endpoint exposes per-replica counters.
+- Security posture, scope, and the operator checklist: [SECURITY.md](SECURITY.md).
+  Project status and measured evaluation floors: [PROJECT_STATUS.md](PROJECT_STATUS.md).
+  Defect ledger: [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md).
+
+## Documentation
+
+| Topic | Where |
+|---|---|
+| Context-serving API | [docs/CONTEXT_API.md](docs/CONTEXT_API.md) |
+| Audit and replay | [docs/AUDIT_DASHBOARD.md](docs/AUDIT_DASHBOARD.md) |
+| Document ingestion | [docs/DOCUMENT_INGESTION.md](docs/DOCUMENT_INGESTION.md) |
+| Embedders | [docs/EMBEDDERS.md](docs/EMBEDDERS.md) |
+| Generation and faithfulness | [docs/GENERATION.md](docs/GENERATION.md) |
+| Extending without touching core | [docs/EXTENDING.md](docs/EXTENDING.md), [CONTRIBUTING.md](CONTRIBUTING.md) |
+
+## Development
+
+```bash
+pip install -e ".[dev]"
+ruff check .
+pytest
+```
 
 ## License
 

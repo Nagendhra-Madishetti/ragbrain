@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cogniflow - the bi-temporal RAG platform</title>
+<meta name="description" content="Cogniflow: cited, temporally-correct answers plus system-time replay. Prove what your AI believed at any past moment. Self-hostable memory and audit layer for agents." />
+<style>
+  :root { --ink:#1c1e21; --mut:#5c6472; --brand:#e4551c; --line:#e8e5df; --bg:#fbfaf8; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font:16px/1.65 -apple-system,"Segoe UI",Inter,Arial,sans-serif; color:var(--ink); background:var(--bg); }
+  .wrap { max-width:880px; margin:0 auto; padding:0 24px; }
+  header { text-align:center; padding:72px 0 48px; }
+  header img { width:140px; height:auto; }
+  h1 { font-size:2.4rem; margin:18px 0 10px; }
+  .tag { color:var(--mut); font-size:1.15rem; max-width:60ch; margin:0 auto; }
+  .cta { margin-top:28px; }
+  .cta a { display:inline-block; padding:12px 22px; border-radius:8px; text-decoration:none; font-weight:600; margin:0 6px; }
+  .cta .primary { background:var(--brand); color:#fff; }
+  .cta .ghost { border:1px solid var(--line); color:var(--ink); background:#fff; }
+  section { padding:40px 0; border-top:1px solid var(--line); }
+  h2 { font-size:1.5rem; margin-bottom:14px; }
+  p  { color:var(--mut); max-width:70ch; }
+  table { border-collapse:collapse; width:100%; margin-top:16px; background:#fff; }
+  th,td { border:1px solid var(--line); padding:10px 14px; text-align:left; font-size:.95rem; }
+  th { background:#f4f2ee; }
+  td.win { color:var(--brand); font-weight:600; }
+  pre { background:#1c1e21; color:#eee; padding:18px; border-radius:8px; overflow-x:auto; margin-top:16px; font-size:.9rem; }
+  img.shot { width:100%; border:1px solid var(--line); border-radius:10px; margin-top:16px; }
+  footer { padding:36px 0 60px; color:var(--mut); font-size:.9rem; text-align:center; border-top:1px solid var(--line); }
+  ul { color:var(--mut); padding-left:20px; }
+  li { margin:6px 0; }
+</style>
+</head>
+<body>
+<header class="wrap">
+  <img src="media/logo.png" alt="Cogniflow logo" />
+  <h1>Cogniflow</h1>
+  <p class="tag">The bi-temporal RAG platform. Cited, temporally-correct answers plus the one
+  capability the rest of the field lacks: replay what the system believed at any past moment,
+  without leaking later corrections into the past.</p>
+  <div class="cta">
+    <a class="primary" href="https://github.com/Nagendhra-web/cogniflow">View on GitHub</a>
+    <a class="ghost" href="https://github.com/Nagendhra-web/cogniflow#quick-start">60-second demo</a>
+  </div>
+</header>
+
+<section class="wrap">
+  <h2>What plain RAG cannot answer</h2>
+  <p>Acme Corp's HQ was Boston (2019 filing), then Denver (2022 filing). Every RAG answers the
+  first row. Only a bi-temporal system answers the third.</p>
+  <table>
+    <tr><th>Question</th><th>Vector RAG</th><th>Valid-time RAG</th><th>Cogniflow</th></tr>
+    <tr><td>Where is Acme HQ now?</td><td>Denver</td><td>Denver</td><td class="win">Denver</td></tr>
+    <tr><td>Where was it in 2020?</td><td>no</td><td>Boston</td><td class="win">Boston</td></tr>
+    <tr><td>What did we believe in 2021, before the correction?</td><td>no</td><td>no</td><td class="win">Boston, Denver un-known</td></tr>
+    <tr><td>Timeline and provenance</td><td>no</td><td>partial</td><td class="win">full audit</td></tr>
+  </table>
+</section>
+
+<section class="wrap">
+  <h2>See it move</h2>
+  <p>The system-time scrubber, driven by the live replay engine. Drag past the 2022 correction
+  and the belief flips; before it, the correction is correctly un-known.</p>
+  <img class="shot" src="media/replay-scrubber.gif" alt="System-time replay scrubber" />
+</section>
+
+<section class="wrap">
+  <h2>Benchmarks</h2>
+  <p>Live, reproducible runs on a fictional corpus (no model can answer from training), with a
+  content hash on every published result. Standard questions are an honest tie; as-of questions
+  are the measured difference.</p>
+  <img class="shot" src="media/benchmark-asof.png" alt="As-of benchmark" />
+  <img class="shot" src="media/benchmark-standard.png" alt="Standard benchmark" />
+</section>
+
+<section class="wrap">
+  <h2>Built for production discipline</h2>
+  <ul>
+    <li>Un-knowing invariant enforced in CI against a live graph store, no model key needed.</li>
+    <li>Answers checked claim-by-claim against the served facts; unsupported claims flagged.</li>
+    <li>Bearer-token auth, token-scoped sessions, rate limits, upload caps.</li>
+    <li>Multi-replica: shared session state and durable shared journal, two-replica proof included.</li>
+    <li>Pluggable embedder, reranker, generation model, and graph backend; fully local operation supported.</li>
+  </ul>
+  <pre>git clone https://github.com/Nagendhra-web/cogniflow &amp;&amp; cd cogniflow
+docker compose up -d --build
+bash scripts/demo.sh</pre>
+</section>
+
+<footer class="wrap">
+  Cogniflow. Apache-2.0. Self-hostable; your data never leaves your environment.
+</footer>
+</body>
+</html>

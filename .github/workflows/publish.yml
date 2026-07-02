@@ -1,0 +1,26 @@
+name: publish
+
+# Publishes cogniflow-rag to PyPI on a version tag (v*), via PyPI Trusted Publishing.
+# One-time setup on pypi.org: project cogniflow-rag -> Publishing -> add this repo/workflow.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Build sdist + wheel
+        run: |
+          python -m pip install --upgrade pip build
+          python -m build
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
