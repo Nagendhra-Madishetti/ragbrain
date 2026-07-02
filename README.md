@@ -97,32 +97,7 @@ system-time slider across 2022 - the answer flips Boston↔Denver in front of yo
 
 ## 🏗 Architecture
 
-```
-                          ┌─────────────────────────────────────────────┐
-   PDF / MD / text ─────▶│ INGEST documents.py │
-   (+ the date true) │ parse → structure-preserving chunk → Episode│
-                          └───────────────┬─────────────────────────────┘
-                                          ▼
-                          ┌─────────────────────────────────────────────┐
-                          │ WRITE (LLM extract + contradiction resolve)│
-                          │ stamps valid_at/invalid_at (EVENT time) │
-                          │ created_at/expired_at (SYSTEM time) │
-                          │ contradiction → expire old + superseded_by │
-                          └───────────────┬─────────────────────────────┘
-                                          ▼
-                          ┌─────────────────────────────────────────────┐
-                          │ STORE FalkorDB (per-group graph) | Neo4j │
-                          └──────┬───────────────────────────┬──────────┘
-             relevance path │ │ audit path (direct temporal scan)
-                                 ▼ ▼
-        ┌──────────────────────────────────┐ ┌──────────────────────────────────────┐
-        │ RETRIEVE serve_context │ │ REPLAY core/audit.py │
-        │ as-of validity-filter → rank │ │ event_time_query(T) valid_at ≤ T │
-        │ → grounded generation → cited │ │ system_time_replay(S) created_at ≤ S │
-        │ answer + provenance │ │ + un-know post-S corrections │
-        └──────────────────────────────────┘ │ → /api/audit/* + the web scrubber │
-                                                └────────────────────────────────────────┘
-```
+
 
 **The core is dependency-free.** `cogniflow.core` imports only the standard library; heavy
 dependencies (`graphiti-core`, `falkordb`, `llama-index-core`) live behind optional extras in
