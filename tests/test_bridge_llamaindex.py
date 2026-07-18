@@ -19,12 +19,12 @@ pytest.importorskip("llama_index.core")
 
 from llama_index.core.schema import NodeWithScore, QueryBundle, TextNode  # noqa: E402
 
-from memry.bridges.llamaindex.postprocessor import (  # noqa: E402
+from ragbrain.bridges.llamaindex.postprocessor import (  # noqa: E402
     TemporalValidityPostprocessor,
 )
-from memry.bridges.llamaindex.retriever import TemporalGraphRetriever  # noqa: E402
-from memry.core.policies import DefaultValidityPolicy, filter_valid  # noqa: E402
-from memry.core.types import (  # noqa: E402
+from ragbrain.bridges.llamaindex.retriever import TemporalGraphRetriever  # noqa: E402
+from ragbrain.core.policies import DefaultValidityPolicy, filter_valid  # noqa: E402
+from ragbrain.core.types import (  # noqa: E402
     Belief,
     RetrievalQuery,
     RetrievalResult,

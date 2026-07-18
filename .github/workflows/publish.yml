@@ -1,7 +1,7 @@
 name: publish
 
-# Publishes memry to PyPI on a version tag (v*), via PyPI Trusted Publishing.
-# One-time setup on pypi.org: project memry -> Publishing -> add this repo/workflow.
+# Publishes ragbrain to PyPI on a version tag (v*), via PyPI Trusted Publishing.
+# One-time setup on pypi.org: project ragbrain -> Publishing -> add this repo/workflow.
 on:
   push:
     tags: ["v*"]

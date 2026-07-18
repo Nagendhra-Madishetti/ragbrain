@@ -9,14 +9,14 @@ from __future__ import annotations
 import asyncio
 from datetime import datetime, timezone
 
-from memry.core.types import (
+from ragbrain.core.types import (
     Belief,
     FalsificationVerdict,
     RetrievalQuery,
     RetrievalResult,
     ScoredBelief,
 )
-from memry.pipelines import temporal_rag_answer
+from ragbrain.pipelines import temporal_rag_answer
 
 
 def _w(year: int) -> datetime:

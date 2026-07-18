@@ -9,8 +9,8 @@ from datetime import datetime, timezone
 
 import pytest
 
-from memry.core.types import Belief
-from memry.registry import (
+from ragbrain.core.types import Belief
+from ragbrain.registry import (
     FAMILIES,
     PolicyNotFoundError,
     available_policies,

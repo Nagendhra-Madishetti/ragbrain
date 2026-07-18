@@ -3,7 +3,7 @@
 A new policy added the way an external contributor would: in a file outside `core/`,
 using ONLY the public API (`register_policy`, `create_policy`, `build_policies`, the
 conformance suite). If this passes with zero changes to core, the open-source promise is
-real - a stranger can extend memry from docs + conformance alone. If core had to
+real - a stranger can extend ragbrain from docs + conformance alone. If core had to
 change, an extension point leaked.
 
 This module IS the contribution (it lives in tests/, touches no core file). The same
@@ -14,9 +14,9 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from memry import available_policies, build_policies, create_policy, register_policy
-from memry.conformance import assert_policy_conforms
-from memry.core.types import Belief
+from ragbrain import available_policies, build_policies, create_policy, register_policy
+from ragbrain.conformance import assert_policy_conforms
+from ragbrain.core.types import Belief
 
 # --- the "third-party" contribution (public API only) ------------------------
 

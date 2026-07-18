@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "memry"
+name = "ragbrain"
 version = "0.1.0"
 description = "Bi-temporal RAG platform: cited, temporally-correct answers plus system-time replay. Self-hostable memory and audit layer for AI agents."
 readme = "README.md"
@@ -57,12 +57,12 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Nagendhra-Madishetti/memry"
-Repository = "https://github.com/Nagendhra-Madishetti/memry"
-Issues = "https://github.com/Nagendhra-Madishetti/memry/issues"
+Homepage = "https://github.com/Nagendhra-Madishetti/ragbrain"
+Repository = "https://github.com/Nagendhra-Madishetti/ragbrain"
+Issues = "https://github.com/Nagendhra-Madishetti/ragbrain/issues"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/memry"]
+packages = ["src/ragbrain"]
 
 [tool.ruff]
 line-length = 100

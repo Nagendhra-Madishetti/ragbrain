@@ -27,19 +27,19 @@ except Exception:
 
 from graphiti_core.edges import EntityEdge  # noqa: E402
 
-from memry.backends.graphiti_falkordb import (  # noqa: E402
+from ragbrain.backends.graphiti_falkordb import (  # noqa: E402
     GraphitiFalkorDBBackend,
     GraphitiFalkorDBConfig,
 )
-from memry.bridges.llamaindex import (  # noqa: E402
+from ragbrain.bridges.llamaindex import (  # noqa: E402
     build_recording_agent,
     make_llm,
 )
-from memry.core.types import Episode  # noqa: E402
-from memry.writeback import WriteBackQueue  # noqa: E402
+from ragbrain.core.types import Episode  # noqa: E402
+from ragbrain.writeback import WriteBackQueue  # noqa: E402
 
-HOST = os.getenv("MEMRY_FALKORDB_HOST", "localhost")
-PORT = int(os.getenv("MEMRY_FALKORDB_PORT", "6379"))
+HOST = os.getenv("RAGBRAIN_FALKORDB_HOST", "localhost")
+PORT = int(os.getenv("RAGBRAIN_FALKORDB_PORT", "6379"))
 
 
 def _falkordb_up() -> bool:
@@ -53,8 +53,8 @@ def _falkordb_up() -> bool:
 
 
 requires_stack = pytest.mark.skipif(
-    not (_falkordb_up() and os.getenv("MEMRY_LLM_API_KEY")),
-    reason="requires a running FalkorDB and MEMRY_LLM_API_KEY",
+    not (_falkordb_up() and os.getenv("RAGBRAIN_LLM_API_KEY")),
+    reason="requires a running FalkorDB and RAGBRAIN_LLM_API_KEY",
 )
 
 
@@ -109,7 +109,7 @@ def test_loop_closes_through_agent() -> None:
             # WRITE through the agent (seam d), not backend.write. The ReAct agent's
             # tool-calling is probabilistic (KNOWN_ISSUES: ReAct re-query reliability),
             # so bound it: retry record+drain until the new fact lands (max 3 attempts).
-            from memry.core.types import RetrievalQuery
+            from ragbrain.core.types import RetrievalQuery
 
             recorder = build_recording_agent(queue, group, llm=llm)
             landed = False

@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from memry.core.types import Episode
+from ragbrain.core.types import Episode
 
 UTC = timezone.utc
 

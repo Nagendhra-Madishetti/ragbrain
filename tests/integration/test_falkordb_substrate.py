@@ -25,15 +25,15 @@ except Exception:
 
 from graphiti_core.edges import EntityEdge  # noqa: E402
 
-from memry.backends.graphiti_falkordb import (  # noqa: E402
+from ragbrain.backends.graphiti_falkordb import (  # noqa: E402
     GraphitiFalkorDBBackend,
     GraphitiFalkorDBConfig,
 )
-from memry.conformance.suite import run_conformance_async  # noqa: E402
-from memry.core.types import Episode, RetrievalQuery  # noqa: E402
+from ragbrain.conformance.suite import run_conformance_async  # noqa: E402
+from ragbrain.core.types import Episode, RetrievalQuery  # noqa: E402
 
-HOST = os.getenv("MEMRY_FALKORDB_HOST", "localhost")
-PORT = int(os.getenv("MEMRY_FALKORDB_PORT", "6379"))
+HOST = os.getenv("RAGBRAIN_FALKORDB_HOST", "localhost")
+PORT = int(os.getenv("RAGBRAIN_FALKORDB_PORT", "6379"))
 
 
 def _falkordb_up() -> bool:
@@ -47,8 +47,8 @@ def _falkordb_up() -> bool:
 
 
 requires_stack = pytest.mark.skipif(
-    not (_falkordb_up() and os.getenv("MEMRY_LLM_API_KEY")),
-    reason="requires a running FalkorDB and MEMRY_LLM_API_KEY",
+    not (_falkordb_up() and os.getenv("RAGBRAIN_LLM_API_KEY")),
+    reason="requires a running FalkorDB and RAGBRAIN_LLM_API_KEY",
 )
 
 

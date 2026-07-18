@@ -10,8 +10,8 @@ from datetime import datetime, timezone
 
 import pytest
 
-from memry.core.types import FalsificationVerdict, RetrievalResult, WriteReceipt
-from memry.documents import (
+from ragbrain.core.types import FalsificationVerdict, RetrievalResult, WriteReceipt
+from ragbrain.documents import (
     DocBlock,
     chunk_blocks,
     document_to_episodes,

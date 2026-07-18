@@ -25,13 +25,13 @@ except Exception:
 
 from graphiti_core.edges import EntityEdge  # noqa: E402
 
-from memry.backends.graphiti_falkordb import (  # noqa: E402
+from ragbrain.backends.graphiti_falkordb import (  # noqa: E402
     GraphitiFalkorDBBackend,
     GraphitiFalkorDBConfig,
 )
-from memry.bridges.llamaindex import make_llm  # noqa: E402
-from memry.okf import ingest_bundle  # noqa: E402
-from memry.pipelines import temporal_rag_answer  # noqa: E402
+from ragbrain.bridges.llamaindex import make_llm  # noqa: E402
+from ragbrain.okf import ingest_bundle  # noqa: E402
+from ragbrain.pipelines import temporal_rag_answer  # noqa: E402
 
 BUNDLE = pathlib.Path(__file__).resolve().parents[2] / "demo" / "okf_demo_bundle"
 QUESTION = "How is Weekly Active Users currently defined? State the trailing-window length."
@@ -48,8 +48,8 @@ def _falkordb_up() -> bool:
 
 
 requires_stack = pytest.mark.skipif(
-    not (_falkordb_up() and os.getenv("MEMRY_LLM_API_KEY")),
-    reason="requires a running FalkorDB and MEMRY_LLM_API_KEY",
+    not (_falkordb_up() and os.getenv("RAGBRAIN_LLM_API_KEY")),
+    reason="requires a running FalkorDB and RAGBRAIN_LLM_API_KEY",
 )
 
 

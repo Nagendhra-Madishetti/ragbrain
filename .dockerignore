@@ -6,7 +6,7 @@
 .env
 .pytest_cache
 .ruff_cache
-memry-web/node_modules
-memry-web/.next
+ragbrain-web/node_modules
+ragbrain-web/.next
 demo/static_demo
 *.png

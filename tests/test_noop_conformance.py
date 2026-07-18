@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from memry.backends.noop import NoOpBackend
-from memry.conformance.suite import assert_conforms, run_conformance
-from memry.core.contracts import Substrate
+from ragbrain.backends.noop import NoOpBackend
+from ragbrain.conformance.suite import assert_conforms, run_conformance
+from ragbrain.core.contracts import Substrate
 
 
 def test_noop_is_a_substrate() -> None:

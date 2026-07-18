@@ -1,8 +1,9 @@
 <div align="center">
 
-![Agent Memry](docs/media/logo.png)
+<img src="docs/media/logo.png" alt="RAGBrain" width="300">
 
-# Agent Memry
+
+# RAGBrain
 
 **The bi-temporal RAG platform. Prove what your AI knew, and when.**
 
@@ -10,7 +11,7 @@ Any document in, a cited and temporally-correct answer out, plus the capability 
 the field lacks: replay what the system believed at any past moment, without leaking later
 corrections into the past.
 
-[![ci](https://github.com/Nagendhra-Madishetti/memry/actions/workflows/ci.yml/badge.svg)](https://github.com/Nagendhra-Madishetti/memry/actions/workflows/ci.yml)
+[![ci](https://github.com/Nagendhra-Madishetti/ragbrain/actions/workflows/ci.yml/badge.svg)](https://github.com/Nagendhra-Madishetti/ragbrain/actions/workflows/ci.yml)
 [![license](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](pyproject.toml)
 
@@ -24,7 +25,7 @@ corrections into the past.
 
 ---
 
-## Why Agent Memry
+## Why RAGBrain
 
 Every fact is stored on two independent time axes: when it was true in the world (event
 time) and when the system learned it (system time). The second axis is what makes answers
@@ -33,7 +34,7 @@ defensible rather than merely plausible.
 Consider one fact that changed: Acme Corp's HQ was Boston (2019 filing), then Denver
 (2022 filing).
 
-| Question | Vector RAG | Valid-time RAG | Agent Memry |
+| Question | Vector RAG | Valid-time RAG | RAGBrain |
 |---|---|---|---|
 | Where is Acme HQ now? | ✅ Denver | ✅ Denver | ✅ Denver |
 | Where was it in 2020? | ❌ | ✅ Boston | ✅ Boston |
@@ -68,7 +69,7 @@ the un-knowing invariant, enforced in CI against a live graph store.
 Prereqs: Docker. No API keys required for the demo.
 
 ```bash
-git clone https://github.com/Nagendhra-Madishetti/memry && cd memry
+git clone https://github.com/Nagendhra-Madishetti/ragbrain && cd ragbrain
 docker compose up -d --build
 bash scripts/demo.sh
 ```
@@ -90,13 +91,13 @@ across 2022; the answer flips in front of you:
 ### Install as a library
 
 ```bash
-pip install memry          # import memry
-pip install "memry[all,serve]"   # backends + the platform API
+pip install ragbrain          # import ragbrain
+pip install "ragbrain[all,serve]"   # backends + the platform API
 ```
 
 ## Architecture
 
-<img width="1060" height="923" alt="Agent Memry architecture" src="docs/media/architecture.png" />
+<img width="1060" height="923" alt="RAGBrain architecture" src="docs/media/architecture.png" />
 
 ```
                           +---------------------------------------------+
@@ -128,7 +129,7 @@ pip install "memry[all,serve]"   # backends + the platform API
                                                  +------------------------------------+
 ```
 
-The core is dependency-free: `memry.core` imports only the standard library. Storage,
+The core is dependency-free: `ragbrain.core` imports only the standard library. Storage,
 models, and retrieval are adapters behind stable interfaces, selected by configuration.
 
 ### The bi-temporal model
@@ -160,11 +161,11 @@ are in the web app's Benchmark page and [PROJECT_STATUS.md](PROJECT_STATUS.md).
 
 ## API
 
-Every route except `/api/health` requires a bearer token (`MEMRY_API_TOKENS`; the compose
-stack provisions `memry-demo-token`). A session is scoped to the token that created it.
+Every route except `/api/health` requires a bearer token (`RAGBRAIN_API_TOKENS`; the compose
+stack provisions `ragbrain-demo-token`). A session is scoped to the token that created it.
 
 ```bash
-TOKEN=memry-demo-token
+TOKEN=ragbrain-demo-token
 API=http://localhost:8000
 H="Authorization: Bearer $TOKEN"
 
@@ -186,16 +187,16 @@ curl -H "$H" -F session_id=mine -F reference_time=2019-01-01 \
      -F file=@your_report.pdf "$API/api/ingest"
 ```
 
-For semantic retrieval configure a real embedder: `MEMRY_EMBEDDER=bge-m3-local`
-(key-free, requires the `[embeddings]` extra) or `MEMRY_EMBEDDER=bge-m3` with
-`MEMRY_EMBEDDER_API_KEY`. The key-free boot default (`hash`) is lexical and states so
+For semantic retrieval configure a real embedder: `RAGBRAIN_EMBEDDER=bge-m3-local`
+(key-free, requires the `[embeddings]` extra) or `RAGBRAIN_EMBEDDER=bge-m3` with
+`RAGBRAIN_EMBEDDER_API_KEY`. The key-free boot default (`hash`) is lexical and states so
 loudly in every response until a real embedder is configured.
 
 ## Deployment
 
 - Local and trusted environments: `docker compose up -d --build`.
 - Multi-replica: `docker compose -f docker-compose.yml -f docker-compose.replicas.yml up -d`
-  with `MEMRY_SHARED_STATE=1`; verify with `bash scripts/two_replica_proof.sh`.
+  with `RAGBRAIN_SHARED_STATE=1`; verify with `bash scripts/two_replica_proof.sh`.
 - Operations: an authenticated `/metrics` endpoint exposes per-replica counters.
 - Security posture, scope, and the operator checklist: [SECURITY.md](SECURITY.md).
   Project status and measured evaluation floors: [PROJECT_STATUS.md](PROJECT_STATUS.md).

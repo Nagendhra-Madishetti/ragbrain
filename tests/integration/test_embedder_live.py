@@ -1,6 +1,6 @@
 """Embedder plug - live probe (acceptance #1): the real BGE-M3 embedder is in the loop and
 produces genuine semantic vectors, distinct from the hash embedder. Needs
-MEMRY_EMBEDDER_API_KEY; skipped without it.
+RAGBRAIN_EMBEDDER_API_KEY; skipped without it.
 """
 
 from __future__ import annotations
@@ -19,12 +19,12 @@ try:
 except Exception:
     pass
 
-from memry.backends._local_embedder import LocalDeterministicEmbedder  # noqa: E402
-from memry.backends.embedders import NvidiaEmbedder, create_embedder  # noqa: E402
+from ragbrain.backends._local_embedder import LocalDeterministicEmbedder  # noqa: E402
+from ragbrain.backends.embedders import NvidiaEmbedder, create_embedder  # noqa: E402
 
 requires_key = pytest.mark.skipif(
-    not os.getenv("MEMRY_EMBEDDER_API_KEY"),
-    reason="requires MEMRY_EMBEDDER_API_KEY",
+    not os.getenv("RAGBRAIN_EMBEDDER_API_KEY"),
+    reason="requires RAGBRAIN_EMBEDDER_API_KEY",
 )
 
 

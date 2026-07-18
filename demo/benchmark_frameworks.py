@@ -1,10 +1,10 @@
 # ruff: noqa: E501
-"""Real multi-framework benchmark: Agent Memry vs the RAG field, every number from a live run.
+"""Real multi-framework benchmark: RAGBrain vs the RAG field, every number from a live run.
 
 Systems (same fictional corpus, same NVIDIA MiniMax LLM for parity):
- - Agent Memry temporal, as-of aware (generate_answer with as_of)
+ - RAGBrain temporal, as-of aware (generate_answer with as_of)
  - Graphiti-substrate the SAME temporal store queried WITHOUT the as-of layer (ablation) -
-                        "the temporal graph very related to Agent Memry" - shows the delta the
+                        "the temporal graph very related to RAGBrain" - shows the delta the
                         as-of layer adds even over its own substrate
  - LlamaIndex vector RAG (NVIDIA embeddings)
  - LangChain BM25 RAG + NVIDIA ChatOpenAI
@@ -39,17 +39,17 @@ load_dotenv(pathlib.Path(__file__).resolve().parents[1] / ".env")
 from benchmark import AS_OF, EPISODES, STANDARD, _hit, build  # noqa: E402
 from nvidia_embeddings import NvidiaEmbedding  # noqa: E402
 
-from memry.backends.graphiti_falkordb import (  # noqa: E402
+from ragbrain.backends.graphiti_falkordb import (  # noqa: E402
     GraphitiFalkorDBBackend,
     GraphitiFalkorDBConfig,
 )
-from memry.bridges.llamaindex import make_llm  # noqa: E402
-from memry.generation import generate_answer  # noqa: E402
-from memry.generators import create_generator_from_env  # noqa: E402
+from ragbrain.bridges.llamaindex import make_llm  # noqa: E402
+from ragbrain.generation import generate_answer  # noqa: E402
+from ragbrain.generators import create_generator_from_env  # noqa: E402
 
-KEY = os.getenv("MEMRY_LLM_API_KEY")
-BASE = os.getenv("MEMRY_LLM_BASE_URL", "https://integrate.api.nvidia.com/v1")
-MODEL = os.getenv("MEMRY_LLM_MODEL", "minimaxai/minimax-m3")
+KEY = os.getenv("RAGBRAIN_LLM_API_KEY")
+BASE = os.getenv("RAGBRAIN_LLM_BASE_URL", "https://integrate.api.nvidia.com/v1")
+MODEL = os.getenv("RAGBRAIN_LLM_MODEL", "minimaxai/minimax-m3")
 GROUP = "bench_frameworks"
 TEXTS = [ep.content for ep in EPISODES]
 OUT = pathlib.Path(__file__).parent / "static_demo" / "benchmark_frameworks.json"
@@ -151,19 +151,19 @@ async def main() -> None:
     except Exception:
         pass
 
-    # Agent Memry store (also serves the Graphiti-substrate ablation)
+    # RAGBrain store (also serves the Graphiti-substrate ablation)
     cfg = GraphitiFalkorDBConfig.from_env(group_id=GROUP)
-    # Honor MEMRY_EMBEDDER (e.g. nvidia-e5 when the hosted bge-m3 has an outage); the
+    # Honor RAGBRAIN_EMBEDDER (e.g. nvidia-e5 when the hosted bge-m3 has an outage); the
     # LlamaIndex helper (NvidiaEmbedding) defaults to e5 too, so both embedding systems match.
-    cfg.embedder = os.getenv("MEMRY_EMBEDDER") or (
-        "bge-m3" if os.getenv("MEMRY_EMBEDDER_API_KEY") else "hash"
+    cfg.embedder = os.getenv("RAGBRAIN_EMBEDDER") or (
+        "bge-m3" if os.getenv("RAGBRAIN_EMBEDDER_API_KEY") else "hash"
     )
     backend = GraphitiFalkorDBBackend(cfg)
     await backend.setup()
     await build(backend)
     gen = create_generator_from_env()
 
-    async def memry(q, as_of):
+    async def ragbrain(q, as_of):
         return (await generate_answer(backend, q, gen, as_of=as_of)).answer
 
     async def ablation(q, as_of): # temporal store, but ignore as_of (no as-of layer)
@@ -174,7 +174,7 @@ async def main() -> None:
     li = make_llamaindex()
 
     systems = [
-        ("Agent Memry", "bi-temporal · as-of", "async", memry),
+        ("RAGBrain", "bi-temporal · as-of", "async", ragbrain),
         ("Graphiti (substrate, no as-of)", "temporal · ablation", "async", ablation),
         ("LlamaIndex", "vector RAG", "sync", li),
         ("LangChain", "BM25 RAG", "sync", lc),

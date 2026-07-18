@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Agent Memry 60-second proof. Run AFTER `docker compose up` (or any running API).
+# RAGBrain 60-second proof. Run AFTER `docker compose up` (or any running API).
 #
 # bash scripts/demo.sh
 #
@@ -8,8 +8,8 @@
 # Carries the milestone bearer token, so it runs against the secure-by-default API, not an open one.
 set -euo pipefail
 
-API="${MEMRY_API_URL:-http://localhost:8000}"
-TOKEN="${MEMRY_DEMO_TOKEN:-memry-demo-token}"
+API="${RAGBRAIN_API_URL:-http://localhost:8000}"
+TOKEN="${RAGBRAIN_DEMO_TOKEN:-ragbrain-demo-token}"
 SID="demo_acme"
 AUTH=(-H "Authorization: Bearer ${TOKEN}")
 
@@ -29,7 +29,7 @@ done
 ok "API is up"
 
 bold "Seeding the Acme HQ scenario (2019 filing: Boston -> 2022 filing: Denver)"
-curl -fsS "${AUTH[@]}" -X POST "${API}/api/demo/seed" >/dev/null || fail "seed failed (token wrong? try MEMRY_DEMO_TOKEN)"
+curl -fsS "${AUTH[@]}" -X POST "${API}/api/demo/seed" >/dev/null || fail "seed failed (token wrong? try RAGBRAIN_DEMO_TOKEN)"
 
 bold "Q1 Where is Acme HQ *now*? (event-time)"
 now=$(curl -fsS "${AUTH[@]}" "${API}/api/audit/current?session_id=${SID}" | city)

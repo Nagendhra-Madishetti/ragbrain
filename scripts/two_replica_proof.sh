@@ -6,9 +6,9 @@
 # un-knowing replay answers identically on both replicas.
 set -euo pipefail
 
-A="${MEMRY_API_A:-http://localhost:8000}"
-B="${MEMRY_API_B:-http://localhost:8001}"
-TOKEN="${MEMRY_DEMO_TOKEN:-memry-demo-token}"
+A="${RAGBRAIN_API_A:-http://localhost:8000}"
+B="${RAGBRAIN_API_B:-http://localhost:8001}"
+TOKEN="${RAGBRAIN_DEMO_TOKEN:-ragbrain-demo-token}"
 AUTH=(-H "Authorization: Bearer ${TOKEN}")
 
 ok() { printf ' \033[32mPASS\033[0m %s\n' "$*"; }

@@ -1,14 +1,14 @@
 cff-version: 1.2.0
-message: "If you use Agent Memry in your work, please cite it as below."
-title: "Agent Memry: a bi-temporal RAG platform with system-time replay"
+message: "If you use RAGBrain in your work, please cite it as below."
+title: "RAGBrain: a bi-temporal RAG platform with system-time replay"
 type: software
 authors:
   - family-names: Madishetti
     given-names: Nagendhra
-repository-code: "https://github.com/Nagendhra-Madishetti/memry"
+repository-code: "https://github.com/Nagendhra-Madishetti/ragbrain"
 license: Apache-2.0
 abstract: >-
-  Agent Memry stores every fact on two independent time axes (event time and system time),
+  RAGBrain stores every fact on two independent time axes (event time and system time),
   serving cited, temporally-correct answers and replaying past belief states without
   leaking later corrections into the past (the un-knowing invariant, enforced in CI).
 keywords:

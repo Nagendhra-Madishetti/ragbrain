@@ -7,18 +7,18 @@ from __future__ import annotations
 import asyncio
 from datetime import datetime, timezone
 
-from memry.core.archive import (
+from ragbrain.core.archive import (
     InMemoryArchive,
     bitemporal_query_archived,
 )
-from memry.core.audit import bitemporal_query
-from memry.core.types import (
+from ragbrain.core.audit import bitemporal_query
+from ragbrain.core.types import (
     Belief,
     FalsificationVerdict,
     RetrievalResult,
     WriteReceipt,
 )
-from memry.writeback import JsonFileJournal, Observation, WriteBackQueue
+from ragbrain.writeback import JsonFileJournal, Observation, WriteBackQueue
 
 
 def _w(year: int) -> datetime:

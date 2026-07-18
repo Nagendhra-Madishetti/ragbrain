@@ -9,13 +9,13 @@ import asyncio
 
 import pytest
 
-from memry.backends.noop import AsyncNoOpBackend, NoOpBackend
-from memry.conformance.suite import (
+from ragbrain.backends.noop import AsyncNoOpBackend, NoOpBackend
+from ragbrain.conformance.suite import (
     assert_conforms_async,
     run_conformance,
     run_conformance_async,
 )
-from memry.core.contracts import AsyncSubstrate, Substrate
+from ragbrain.core.contracts import AsyncSubstrate, Substrate
 
 
 def test_async_noop_passes_async_conformance() -> None:

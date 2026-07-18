@@ -10,10 +10,10 @@ from datetime import datetime, timezone
 
 import pytest
 
-from memry.conformance import run_policy_conformance
-from memry.core.types import Belief
-from memry.registry import available_policies, create_policy
-from memry.verification import LLMFalsificationPolicy
+from ragbrain.conformance import run_policy_conformance
+from ragbrain.core.types import Belief
+from ragbrain.registry import available_policies, create_policy
+from ragbrain.verification import LLMFalsificationPolicy
 
 
 def _w(year: int) -> datetime:
@@ -90,8 +90,8 @@ llama = pytest.importorskip("llama_index.core") # noqa: F841
 def test_verify_fact_tool_is_read_only() -> None:
     import asyncio
 
-    from memry.bridges.llamaindex import make_verify_fact_tool
-    from memry.core.types import RetrievalQuery, RetrievalResult, ScoredBelief
+    from ragbrain.bridges.llamaindex import make_verify_fact_tool
+    from ragbrain.core.types import RetrievalQuery, RetrievalResult, ScoredBelief
 
     class _ReadOnlyTrackingBackend:
         def __init__(self) -> None:

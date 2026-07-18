@@ -24,15 +24,15 @@ except Exception:
 
 from graphiti_core.edges import EntityEdge  # noqa: E402
 
-from memry.backends.graphiti_falkordb import (  # noqa: E402
+from ragbrain.backends.graphiti_falkordb import (  # noqa: E402
     GraphitiFalkorDBBackend,
     GraphitiFalkorDBConfig,
 )
-from memry.core.types import Episode, RetrievalQuery  # noqa: E402
+from ragbrain.core.types import Episode, RetrievalQuery  # noqa: E402
 
-NEO4J_URI = os.getenv("MEMRY_NEO4J_URI", "bolt://localhost:7687")
-NEO4J_USER = os.getenv("MEMRY_NEO4J_USER", "neo4j")
-NEO4J_PASSWORD = os.getenv("MEMRY_NEO4J_PASSWORD", "memrytest")
+NEO4J_URI = os.getenv("RAGBRAIN_NEO4J_URI", "bolt://localhost:7687")
+NEO4J_USER = os.getenv("RAGBRAIN_NEO4J_USER", "neo4j")
+NEO4J_PASSWORD = os.getenv("RAGBRAIN_NEO4J_PASSWORD", "ragbraintest")
 
 
 def _neo4j_up() -> bool:
@@ -48,8 +48,8 @@ def _neo4j_up() -> bool:
 
 
 requires_neo4j = pytest.mark.skipif(
-    not (_neo4j_up() and os.getenv("MEMRY_LLM_API_KEY")),
-    reason="requires a reachable Neo4j and MEMRY_LLM_API_KEY",
+    not (_neo4j_up() and os.getenv("RAGBRAIN_LLM_API_KEY")),
+    reason="requires a reachable Neo4j and RAGBRAIN_LLM_API_KEY",
 )
 
 

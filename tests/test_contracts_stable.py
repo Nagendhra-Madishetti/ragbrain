@@ -6,9 +6,9 @@ from __future__ import annotations
 
 import dataclasses
 
-from memry.bridges import contracts as bridges
-from memry.core import policies, types
-from memry.core.contracts import AsyncSubstrate, Substrate
+from ragbrain.bridges import contracts as bridges
+from ragbrain.core import policies, types
+from ragbrain.core.contracts import AsyncSubstrate, Substrate
 
 
 def _fields(dc: type) -> set[str]:

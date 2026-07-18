@@ -11,8 +11,8 @@ import pytest
 
 pytest.importorskip("yaml")
 
-from memry.core.types import FalsificationVerdict, RetrievalResult, WriteReceipt  # noqa: E402
-from memry.okf import (  # noqa: E402
+from ragbrain.core.types import FalsificationVerdict, RetrievalResult, WriteReceipt  # noqa: E402
+from ragbrain.okf import (  # noqa: E402
     concept_to_episode,
     ingest_bundle,
     parse_bundle,

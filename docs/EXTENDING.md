@@ -1,4 +1,4 @@
-# Extending Agent Memry
+# Extending RAGBrain
 
 One page, one worked example per extension point, plus the **exact command** that
 certifies a contribution. Everything here uses only the public API - no `core/` edits.
@@ -7,8 +7,8 @@ certifies a contribution. Everything here uses only the public API - no `core/` 
 
 ```python
 from datetime import datetime
-from memry import register_policy
-from memry.core.types import Belief
+from ragbrain import register_policy
+from ragbrain.core.types import Belief
 
 @register_policy("validity", "closed_interval")
 class ClosedIntervalValidity:
@@ -25,8 +25,8 @@ class ClosedIntervalValidity:
 Certify it:
 
 ```python
-from memry import create_policy
-from memry.conformance import assert_policy_conforms
+from ragbrain import create_policy
+from ragbrain.conformance import assert_policy_conforms
 assert_policy_conforms("validity", create_policy("validity", "closed_interval"))
 ```
 
@@ -38,26 +38,26 @@ that it needs zero core changes is `tests/test_contributor_proof.py`.
 **Family notes:** validity stays boolean; ranking/decay belongs to retrieval;
 falsification is read-only (a verdict, never a write) and may be `indeterminate`;
 writeback is a pure boolean of the result. An LLM falsification policy is exempt from the
-determinism tier but must still pass the invariants (see `memry.verification`).
+determinism tier but must still pass the invariants (see `ragbrain.verification`).
 
 ## 2. A substrate backend
 
-Implement `memry.core.contracts.AsyncSubstrate` (`write` / `read` / `falsify`).
+Implement `ragbrain.core.contracts.AsyncSubstrate` (`write` / `read` / `falsify`).
 
 ```python
-from memry.conformance import run_conformance_async
+from ragbrain.conformance import run_conformance_async
 results = await run_conformance_async(MyBackend(...))
 assert all(r.passed for r in results)
 ```
 
-Optionally implement `memry.core.audit.AuditLedger` for replay; it must satisfy the
+Optionally implement `ragbrain.core.audit.AuditLedger` for replay; it must satisfy the
 un-knowing invariant (a replay to S must not show an invalidation learned after S). The
 reference backend is `GraphitiFalkorDBBackend`; Neo4j parity is `tests/integration/
 test_neo4j_parity.py` - the same assertions, no weakened check.
 
 ## 3. LlamaIndex retriever / postprocessor / tool
 
-Subclass the bridge bases in `memry.bridges.llamaindex` (`TemporalGraphRetriever`,
+Subclass the bridge bases in `ragbrain.bridges.llamaindex` (`TemporalGraphRetriever`,
 `TemporalValidityPostprocessor`) or build a `FunctionTool` like
 `make_verify_fact_tool`. Override the `_a*` (async) methods. The postprocessor must
 receive the substrate's validity instance (one instance, not one class) - injection is
@@ -65,13 +65,13 @@ required, there is no silent default.
 
 ## 4. Replay exporter / eval scenario
 
-Use `memry.eval.score_falsification(policy, cases)` to score a contradiction set;
+Use `ragbrain.eval.score_falsification(policy, cases)` to score a contradiction set;
 report precision/recall (recall is the headline for an audit ledger). Add cases to grow
 the corpus over time.
 
 ## 5. Archive store (scale)
 
-Implement `memry.core.archive.ArchiveStore` (`archive` / `load`). Replay must union
+Implement `ragbrain.core.archive.ArchiveStore` (`archive` / `load`). Replay must union
 hot + cold (`bitemporal_query_archived`), so archiving never breaks history.
 
 ## The one rule

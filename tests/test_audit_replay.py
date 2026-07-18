@@ -10,15 +10,15 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from memry.conformance import check_falsification_determinism, run_policy_conformance
-from memry.core.audit import (
+from ragbrain.conformance import check_falsification_determinism, run_policy_conformance
+from ragbrain.core.audit import (
     bitemporal_query,
     event_time_query,
     reconstruct_as_of_system,
     system_time_replay,
 )
-from memry.core.types import Belief, FalsificationVerdict
-from memry.registry import create_policy
+from ragbrain.core.types import Belief, FalsificationVerdict
+from ragbrain.registry import create_policy
 
 
 def _w(year: int) -> datetime: # world (event) time

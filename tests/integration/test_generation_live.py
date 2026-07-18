@@ -22,13 +22,13 @@ try:
 except Exception:
     pass
 
-from memry.backends.graphiti_falkordb import (  # noqa: E402
+from ragbrain.backends.graphiti_falkordb import (  # noqa: E402
     GraphitiFalkorDBBackend,
     GraphitiFalkorDBConfig,
 )
-from memry.core.types import Episode  # noqa: E402
-from memry.generation import generate_answer  # noqa: E402
-from memry.generators import create_generator_from_env  # noqa: E402
+from ragbrain.core.types import Episode  # noqa: E402
+from ragbrain.generation import generate_answer  # noqa: E402
+from ragbrain.generators import create_generator_from_env  # noqa: E402
 
 UTC = timezone.utc
 
@@ -48,8 +48,8 @@ def _falkordb_up() -> bool:
 
 
 requires_stack = pytest.mark.skipif(
-    not (_falkordb_up() and os.getenv("MEMRY_LLM_API_KEY")),
-    reason="requires FalkorDB and MEMRY_LLM_API_KEY",
+    not (_falkordb_up() and os.getenv("RAGBRAIN_LLM_API_KEY")),
+    reason="requires FalkorDB and RAGBRAIN_LLM_API_KEY",
 )
 
 

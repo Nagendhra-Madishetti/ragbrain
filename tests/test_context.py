@@ -8,13 +8,13 @@ import asyncio
 import json
 from datetime import datetime, timezone
 
-from memry.context import (
+from ragbrain.context import (
     ContextResponse,
     ServedFact,
     _normalize_source,
     serve_context,
 )
-from memry.core.types import (
+from ragbrain.core.types import (
     Belief,
     FalsificationVerdict,
     RetrievalQuery,

@@ -26,12 +26,12 @@ try:
 except Exception:
     pass
 
-from memry.backends.graphiti_falkordb import (  # noqa: E402
+from ragbrain.backends.graphiti_falkordb import (  # noqa: E402
     GraphitiFalkorDBBackend,
     GraphitiFalkorDBConfig,
 )
-from memry.context import serve_context  # noqa: E402
-from memry.documents import ingest_document  # noqa: E402
+from ragbrain.context import serve_context  # noqa: E402
+from ragbrain.documents import ingest_document  # noqa: E402
 
 CORPUS = pathlib.Path(__file__).resolve().parents[2] / "demo" / "doc_demo_corpus"
 
@@ -47,8 +47,8 @@ def _falkordb_up() -> bool:
 
 
 requires_stack = pytest.mark.skipif(
-    not (_falkordb_up() and os.getenv("MEMRY_LLM_API_KEY") and CORPUS.exists()),
-    reason="requires FalkorDB, MEMRY_LLM_API_KEY, and the demo PDF corpus",
+    not (_falkordb_up() and os.getenv("RAGBRAIN_LLM_API_KEY") and CORPUS.exists()),
+    reason="requires FalkorDB, RAGBRAIN_LLM_API_KEY, and the demo PDF corpus",
 )
 
 

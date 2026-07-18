@@ -12,7 +12,7 @@ import importlib.util
 
 import pytest
 
-from memry.rerankers import RerankerError, create_reranker
+from ragbrain.rerankers import RerankerError, create_reranker
 
 _HAS_FLAG = importlib.util.find_spec("FlagEmbedding") is not None
 

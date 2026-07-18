@@ -17,22 +17,22 @@ from datetime import datetime, timezone
 
 import pytest
 
-from memry.context import ServedFact
-from memry.core.types import (
+from ragbrain.context import ServedFact
+from ragbrain.core.types import (
     Belief,
     FalsificationVerdict,
     RetrievalQuery,
     RetrievalResult,
     ScoredBelief,
 )
-from memry.faithfulness import (
+from ragbrain.faithfulness import (
     FaithfulnessError,
     LexicalChecker,
     available_checkers,
     create_checker,
     decompose,
 )
-from memry.generation import generate_answer
+from ragbrain.generation import generate_answer
 
 
 def _dt(y: int) -> datetime:

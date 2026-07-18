@@ -10,21 +10,21 @@ from datetime import datetime, timezone
 
 import pytest
 
-from memry.core.audit import (
+from ragbrain.core.audit import (
     bitemporal_query as _bitemporal,
 )
-from memry.core.audit import (
+from ragbrain.core.audit import (
     event_time_query as _event,
 )
-from memry.core.audit import (
+from ragbrain.core.audit import (
     system_time_replay as _replay,
 )
-from memry.core.types import Belief, ProvenanceTrace
+from ragbrain.core.types import Belief, ProvenanceTrace
 
 pytest.importorskip("fastapi")
 from fastapi.testclient import TestClient  # noqa: E402
 
-from memry.serving import create_audit_app  # noqa: E402
+from ragbrain.serving import create_audit_app  # noqa: E402
 
 
 def _dt(y: int, m: int = 1) -> datetime:

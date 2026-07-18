@@ -10,8 +10,8 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from memry import build_policies, create_policy
-from memry.core.types import Belief
+from ragbrain import build_policies, create_policy
+from ragbrain.core.types import Belief
 
 # A config a deployment might load from YAML/env. Omitted families use named defaults.
 CONFIG = {
