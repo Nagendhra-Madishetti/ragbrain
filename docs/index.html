@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAGBrain · Bi-temporal RAG</title>
+<meta name="description" content="RAG with a brain. An open-source bi-temporal RAG platform that remembers what it knew, and when it knew it.">
+<style>
+  :root {
+    --bg:#FFFFFF; --ink:#1F2328; --ink2:#59636E; --ink3:#818B98; --ink4:#AFB8C1;
+    --line:#D1D9E0; --line2:#EAEEF2; --accent:#4D7C0F; --cool:#0E7490; --chip:#F6F8FA;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:#0D1117; --ink:#E6EDF3; --ink2:#8B949E; --ink3:#6E7681; --ink4:#484F58;
+      --line:#21262D; --line2:#171C22; --accent:#D8FF4F; --cool:#38BDF8; --chip:#161B22;
+    }
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { -webkit-text-size-adjust:100%; }
+  body {
+    background:var(--bg); color:var(--ink);
+    font-family:'Inter','SF Pro Text',-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    font-feature-settings:'tnum' 1; line-height:1.55;
+  }
+  .wrap { max-width:1000px; margin:0 auto; padding:0 28px; }
+  .rule { border-top:1px solid var(--line); }
+  .lbl { font-size:11.5px; font-weight:500; letter-spacing:2.4px; text-transform:uppercase; color:var(--ink3); }
+  .mono { font-family:ui-monospace,'SF Mono',Consolas,Menlo,monospace; }
+
+  header { padding:26px 0; }
+  .top { display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; }
+
+  .hero { padding:76px 0 60px; }
+  h1 { font-size:clamp(44px,8vw,86px); font-weight:700; letter-spacing:-4px; line-height:0.98; text-wrap:balance; }
+  h1 .dim { color:var(--ink4); }
+  .lede { font-size:19px; color:var(--ink2); max-width:60ch; margin-top:26px; }
+  .cta { display:flex; gap:12px; margin-top:34px; flex-wrap:wrap; align-items:center; }
+  .btn {
+    display:inline-block; font-size:14px; font-weight:600; text-decoration:none;
+    padding:11px 20px; border-radius:8px; border:1px solid var(--line); color:var(--ink);
+    transition:border-color .15s ease, transform .15s ease;
+  }
+  .btn:hover { border-color:var(--ink3); transform:translateY(-1px); }
+  .btn.primary { background:var(--ink); color:var(--bg); border-color:var(--ink); }
+  .install { font-size:14px; padding:11px 16px; border:1px dashed var(--line); border-radius:8px; color:var(--ink2); }
+
+  section { padding:60px 0; }
+  h2 { font-size:13px; font-weight:600; letter-spacing:2.6px; text-transform:uppercase; color:var(--ink3); margin-bottom:26px; }
+  h3 { font-size:26px; font-weight:600; letter-spacing:-0.8px; margin-bottom:10px; }
+  p.body { font-size:16.5px; color:var(--ink2); max-width:68ch; }
+
+  /* replay instrument */
+  .panel { border:1px solid var(--line); border-radius:14px; padding:28px; background:var(--bg); }
+  .knew { display:flex; justify-content:space-between; align-items:baseline; gap:16px; margin-bottom:16px; }
+  .knew .date { font-size:30px; font-weight:600; letter-spacing:-1.2px; }
+  input[type=range]{ -webkit-appearance:none; appearance:none; width:100%; height:5px; border-radius:99px; outline:none; cursor:pointer; background:var(--line); }
+  input[type=range]::-webkit-slider-thumb{ -webkit-appearance:none; width:20px; height:20px; border-radius:50%; background:var(--accent); border:3px solid var(--bg); box-shadow:0 0 0 1px var(--line); cursor:grab; }
+  input[type=range]::-moz-range-thumb{ width:16px; height:16px; border-radius:50%; background:var(--accent); border:3px solid var(--bg); }
+  input[type=range]:focus-visible{ box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent); }
+  .scale { position:relative; height:20px; margin-top:10px; font-size:11.5px; color:var(--ink3); }
+  .scale .l { position:absolute; left:0; } .scale .r { position:absolute; right:0; }
+  .scale .mid { position:absolute; left:59.7%; transform:translateX(-50%); color:var(--accent); font-weight:600; white-space:nowrap; }
+  .readout { margin-top:20px; padding:20px; border:1px solid var(--line2); border-radius:10px; background:var(--chip); min-height:132px; }
+  .readout .stmt { font-size:21px; font-weight:600; letter-spacing:-0.5px; }
+  .readout .stmt .city { color:var(--cool); }
+  .readout .stmt .city.new { color:var(--accent); }
+  .readout .exp { font-size:14.5px; color:var(--ink2); margin-top:8px; }
+  .readout .meta { font-size:12.5px; color:var(--ink3); margin-top:12px; }
+  .readout.empty .stmt { color:var(--ink3); font-weight:500; font-size:19px; }
+  .facts { margin-top:18px; display:grid; gap:10px; }
+  .fact { display:flex; justify-content:space-between; gap:14px; align-items:flex-start; padding:13px 16px; border:1px solid var(--line2); border-radius:10px; transition:opacity .2s; }
+  .fact .s { font-size:15px; font-weight:600; }
+  .fact .s.struck { text-decoration:line-through; color:var(--ink3); font-weight:500; }
+  .fact .m { font-size:12px; color:var(--ink3); margin-top:4px; }
+  .fact.dim { opacity:.45; }
+  .chip { flex:none; font-size:11px; font-weight:600; letter-spacing:.4px; padding:3px 10px; border-radius:99px; border:1px solid var(--line); color:var(--ink3); }
+  .chip.live { color:var(--accent); border-color:var(--accent); }
+  .chip.sup { color:var(--ink3); }
+
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1px; background:var(--line2); border:1px solid var(--line2); border-radius:14px; overflow:hidden; }
+  .cell { background:var(--bg); padding:26px; }
+  .cell h4 { font-size:16px; font-weight:600; margin-bottom:8px; }
+  .cell p { font-size:14.5px; color:var(--ink2); }
+  table.axes { width:100%; border-collapse:collapse; margin-top:8px; }
+  table.axes td { padding:12px 0; border-top:1px solid var(--line2); font-size:15px; vertical-align:top; }
+  table.axes td:first-child { width:34%; color:var(--ink); font-weight:600; }
+  table.axes td:last-child { color:var(--ink2); }
+
+  footer { padding:44px 0 60px; color:var(--ink3); font-size:14px; display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  a { color:inherit; }
+  footer a, .top a { text-decoration:none; }
+  footer a:hover, .top a:hover { color:var(--ink); }
+  @media (prefers-reduced-motion: reduce) { * { transition:none !important; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <span class="lbl" style="color:var(--ink)">RAGBrain</span>
+    <span style="display:flex; gap:18px; font-size:13.5px; color:var(--ink3)">
+      <a href="https://github.com/Nagendhra-Madishetti/ragbrain">GitHub</a>
+      <a href="https://pypi.org/project/ragbrain/">PyPI</a>
+      <a href="#replay">Demo</a>
+    </span>
+  </header>
+</div>
+<div class="rule"></div>
+
+<div class="wrap">
+  <section class="hero">
+    <h1>RAG with<br><span class="dim">a brain.</span></h1>
+    <p class="lede">An open-source bi-temporal RAG platform. It remembers what it knew, and when it knew it, so an answer about the past is defensible rather than merely plausible.</p>
+    <div class="cta">
+      <a class="btn primary" href="#replay">Try the replay</a>
+      <a class="btn" href="https://github.com/Nagendhra-Madishetti/ragbrain">Source</a>
+      <span class="install mono">pip install ragbrain</span>
+    </div>
+  </section>
+</div>
+<div class="rule"></div>
+
+<div class="wrap">
+  <section id="replay">
+    <h2>The invariant, live</h2>
+    <h3>What did the system believe, and when?</h3>
+    <p class="body" style="margin-bottom:26px">Acme Corp moved its headquarters. The 2019 filing said Boston; the 2022 filing said Denver. Drag the slider to replay what the ledger knew at any past moment. Later corrections never leak backward.</p>
+
+    <div class="panel">
+      <div class="knew">
+        <span class="lbl">The system knew, as of</span>
+        <span class="date mono" id="date">Jun 2018</span>
+      </div>
+      <input type="range" id="s" min="0" max="72" step="1" value="0" aria-label="system time">
+      <div class="scale">
+        <span class="l">2018</span><span class="mid">&#8593; 2022 correction</span><span class="r">2024</span>
+      </div>
+      <div class="readout" id="readout"></div>
+      <div class="facts">
+        <div class="fact" id="fb">
+          <div><div class="s" id="fbs">Acme Corp is headquartered in Boston</div><div class="m" id="fbm"></div></div>
+          <span class="chip" id="fbc"></span>
+        </div>
+        <div class="fact" id="fd">
+          <div><div class="s">Acme Corp is headquartered in Denver</div><div class="m" id="fdm"></div></div>
+          <span class="chip" id="fdc"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<div class="rule"></div>
+
+<div class="wrap">
+  <section>
+    <h2>Two time axes</h2>
+    <table class="axes">
+      <tr><td>Event time <span class="mono" style="color:var(--ink3);font-weight:400">[valid_at, invalid_at)</span></td>
+          <td>When the fact was true in the world. Answers &ldquo;where was it in 2020?&rdquo;</td></tr>
+      <tr><td>System time <span class="mono" style="color:var(--ink3);font-weight:400">[created_at, expired_at)</span></td>
+          <td>When the system learned it. Answers &ldquo;what did we believe last March?&rdquo; and powers replay.</td></tr>
+    </table>
+  </section>
+</div>
+<div class="rule"></div>
+
+<div class="wrap">
+  <section>
+    <h2>What that buys you</h2>
+    <div class="grid">
+      <div class="cell"><h4>Corrections supersede</h4><p>A correcting fact expires the old one and stamps a back-link at write time. Nothing is silently overwritten, so the timeline stays intact.</p></div>
+      <div class="cell"><h4>Cited, checked answers</h4><p>Generation is constrained to served facts and verified claim by claim afterwards. Unsupported claims are flagged, never quietly shipped.</p></div>
+      <div class="cell"><h4>Self-hostable</h4><p>FalkorDB or Neo4j, local or hosted embedders, your infrastructure. The core imports only the standard library.</p></div>
+    </div>
+  </section>
+</div>
+<div class="rule"></div>
+
+<div class="wrap">
+  <footer>
+    <span class="mono">pip install ragbrain &nbsp;·&nbsp; Apache 2.0</span>
+    <span><a href="https://github.com/Nagendhra-Madishetti/ragbrain">github.com/Nagendhra-Madishetti/ragbrain</a></span>
+  </footer>
+</div>
+
+<script>
+(function () {
+  var slider = document.getElementById("s");
+  var dateEl = document.getElementById("date");
+  var readout = document.getElementById("readout");
+  var LEARN_BOSTON = 7, LEARN_DENVER = 43;
+  var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+  function label(v) { var d = new Date(2018, 5 + v); return MONTHS[d.getMonth()] + " " + d.getFullYear(); }
+  function chip(id, cls, txt) { var e = document.getElementById(id); e.className = "chip " + cls; e.textContent = txt; }
+
+  function render() {
+    var v = +slider.value;
+    dateEl.textContent = label(v);
+    var pct = (v / 72) * 100;
+    slider.style.background = "linear-gradient(to right, var(--accent) " + pct + "%, var(--line) " + pct + "%)";
+
+    var fb = document.getElementById("fb"), fd = document.getElementById("fd"), fbs = document.getElementById("fbs");
+
+    if (v < LEARN_BOSTON) {
+      readout.className = "readout empty";
+      readout.innerHTML = '<div class="stmt">As of ' + label(v) + ', the system had not yet learned anything about Acme Corp.</div>';
+      fb.className = "fact dim"; fd.className = "fact dim"; fbs.className = "s";
+      chip("fbc", "", "not yet known"); chip("fdc", "", "not yet known");
+      document.getElementById("fbm").textContent = "learned Jan 2019";
+      document.getElementById("fdm").textContent = "learned Jan 2022";
+    } else if (v < LEARN_DENVER) {
+      readout.className = "readout";
+      readout.innerHTML = '<div class="stmt">Acme Corp is headquartered in <span class="city">Boston</span></div>'
+        + '<div class="exp">The 2022 correction has not arrived yet, so it is un-known at this system time.</div>'
+        + '<div class="meta mono">valid 2019-01-01 &#8594; present &nbsp;·&nbsp; source: 2019 annual report</div>';
+      fb.className = "fact"; fd.className = "fact dim"; fbs.className = "s";
+      chip("fbc", "live", "live"); chip("fdc", "", "not yet known");
+      document.getElementById("fbm").textContent = "valid 2019-01-01 → present (from this vantage)";
+      document.getElementById("fdm").textContent = "learned Jan 2022";
+    } else {
+      readout.className = "readout";
+      readout.innerHTML = '<div class="stmt">Acme Corp is headquartered in <span class="city new">Denver</span></div>'
+        + '<div class="exp">The correction is ingested: Boston is expired and stamped with what superseded it.</div>'
+        + '<div class="meta mono">valid 2022-01-01 &#8594; present &nbsp;·&nbsp; superseded_by: 2022 press release</div>';
+      fb.className = "fact"; fd.className = "fact"; fbs.className = "s struck";
+      chip("fbc", "sup", "superseded"); chip("fdc", "live", "live");
+      document.getElementById("fbm").textContent = "valid 2019-01-01 → 2022-01-01 · superseded by 2022 press release";
+      document.getElementById("fdm").textContent = "valid 2022-01-01 → present";
+    }
+  }
+  slider.addEventListener("input", render);
+  // browsers restore form state across reloads; the demo must always open at the start
+  slider.value = "0";
+  render();
+})();
+</script>
+</body>
+</html>
