@@ -27,3 +27,4 @@ htmlcov/
 
 # OMC orchestration state
 .omc/
+launch/
