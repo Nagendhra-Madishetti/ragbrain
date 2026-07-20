@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ragbrain"
-version = "0.1.0"
+version = "0.1.1"
 description = "Bi-temporal RAG platform: cited, temporally-correct answers plus system-time replay. Self-hostable memory and audit layer for AI agents."
 readme = "README.md"
 requires-python = ">=3.10,<4"
