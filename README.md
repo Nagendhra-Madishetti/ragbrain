@@ -7,14 +7,9 @@
 
 **The Open-Source Bi-Temporal RAG Framework for AI Agents. Prove what your AI knew, and when.**
 
-RAGBrain is a **long-term memory and retrieval layer for LLM agents**. It pairs
-retrieval-augmented generation with a **temporal knowledge graph**, so an agent can answer
-what is true *now*, what was true *on any past date*, and what the system *believed at a past
-moment* before a correction arrived.
-
-Any document in, a cited and temporally-correct answer out, plus the capability the rest of
-the field lacks: replay what the system believed at any past moment, without leaking later
-corrections into the past.
+In plain terms: memory for AI agents that keeps track of how facts change. Ask what is true
+now, what was true on any past date, or what your system believed last March before someone
+corrected it.
 
 `agent memory` · `LLM long-term memory` · `temporal knowledge graph` · `point-in-time queries`
 · `GraphRAG` · `vector search` · `grounded answers` · `provenance and audit` · `MCP server`
@@ -24,6 +19,7 @@ corrections into the past.
 [![license](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](pyproject.toml)
 
+[What is this?](#what-is-this) ·
 [Quick start](#quick-start) ·
 [Architecture](#architecture) ·
 [Benchmarks](#benchmarks) ·
@@ -34,13 +30,43 @@ corrections into the past.
 
 ---
 
+## What is this?
+
+Your code has version history. Your AI's knowledge does not.
+
+When a fact changes, most AI systems overwrite the old one. The previous answer is gone, and
+the system behaves as if it was never true. That is fine for a chatbot. It is a problem the
+moment someone asks you to justify an answer your AI gave six months ago.
+
+RAGBrain keeps the whole history instead of overwriting it. Say your company moved its
+headquarters from Boston to Denver in 2022:
+
+| You ask | RAGBrain answers | Ordinary RAG |
+|---|---|---|
+| "Where is our HQ?" | Denver | Denver |
+| "Where was it in 2020?" | Boston | usually wrong, or guesses |
+| "What did our system believe in 2021, before we recorded the move?" | Boston, and it does not know about Denver yet | cannot answer at all |
+
+That third question is the whole point. Replaying the past properly means genuinely **not
+knowing** what you only learned later. If your system replays March and quietly includes an
+April correction, the replay is fiction, and fiction is useless in an audit.
+
+Think of it as **version history for facts**, with the source of each one attached.
+
+**Who needs this:** anyone whose answers can be challenged later. Finance, legal, healthcare,
+compliance, internal tools built on policies and prices that keep changing, and agents that
+must not confidently repeat something that stopped being true last quarter.
+
+**Who does not:** if your data never changes, or nobody will ever ask what you knew and when,
+a normal vector database is simpler and you should use one.
+
 ## Why RAGBrain
 
-Every fact is stored on two independent time axes: when it was true in the world (event
-time) and when the system learned it (system time). The second axis is what makes answers
-defensible rather than merely plausible.
+Under the hood, every fact is stored on two independent time axes: when it was true in the
+world (event time) and when the system learned it (system time). The second axis is what
+makes answers defensible rather than merely plausible.
 
-Consider one fact that changed: Acme Corp's HQ was Boston (2019 filing), then Denver
+Take the same fact that changed: Acme Corp's HQ was Boston (2019 filing), then Denver
 (2022 filing).
 
 | Question | Vector RAG | Valid-time RAG | RAGBrain |
